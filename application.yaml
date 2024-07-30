@@ -1,0 +1,25 @@
+server:
+  port: 8889
+  # 运行模式，dev/prod
+  mode: dev
+  # 缓存模式，memory/redis
+  cache: memory
+datasource:
+  type: mysql
+  url: test:123456@tcp(test.nineya.com:3306)/test_tool?charset=utf8mb4&parseTime=True&loc=Local
+  max-idle-conns: 10
+  max-open-conns: 10
+  use-cache: true
+  cache-size: 1000
+  show-sql: true
+redis:
+  db: 8889
+  host: 'test.nineya.com:6379'
+  password: '361654768'
+jwt:
+  signing-key: 'tool-server'
+  expires-time: 604800
+  buffer-time: 86400
+logger:
+  path: logs
+  log-in-console: true

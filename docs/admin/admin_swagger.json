@@ -1,0 +1,5485 @@
+{
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Aurora 建站",
+        "title": "Aurora Admin-API 文档",
+        "contact": {
+            "name": "nineya",
+            "url": "https://www.nineya.com",
+            "email": "361654768@qq.com"
+        },
+        "version": "v0.0.1"
+    },
+    "host": "localhost:8888",
+    "basePath": "/api/admin",
+    "paths": {
+        "/admin": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Create admin",
+                "parameters": [
+                    {
+                        "description": "Admin information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Admin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Admin"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/all": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get admin list by group id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get admin list by group id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Admin group id",
+                        "name": "group",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/table.Admin"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/group": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create admin group",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Create admin group",
+                "parameters": [
+                    {
+                        "description": "Admin group information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.AdminGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.AdminGroup"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/group/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get admin group by id",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get admin group by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.AdminGroup"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById admin group by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "UpdateById admin group by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Category information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.AdminGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete admin group by id",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete admin group by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/list": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Page for a list of admins",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Page for a list of admins",
+                "parameters": [
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.PageResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "content": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/table.Admin"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/profiles": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get admin profiles",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get admin profiles",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Admin"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById admin profiles",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "UpdateById admin profiles",
+                "parameters": [
+                    {
+                        "description": "admin information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateAdminParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/profiles/password": {
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById admin password",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "UpdateById admin password",
+                "parameters": [
+                    {
+                        "description": "admin old and new password",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdatePasswordParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete admin by id",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete admin by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "admin id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/batch": {
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById attachments in batches using the id list",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "UpdateById attachments in batches using the id list",
+                "parameters": [
+                    {
+                        "description": "Attachment name and team information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.BatchUpdateAttachmentParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete attachments in batches using the id list",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Delete attachments in batches using the id list",
+                "parameters": [
+                    {
+                        "description": "Attachment id list",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/list": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Page for a list of attachments",
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Page for a list of attachments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 30,
+                        "type": "string",
+                        "name": "team",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.PageResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "content": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/table.Attachment"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/mime_types": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get attachment for all mimeTypes",
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Get attachment for all mimeTypes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/teams": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get attachments for all teams",
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Get attachments for all teams",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/upload": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Upload attachment",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Upload attachment",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "File stream",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Attachment team",
+                        "name": "team",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Attachment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get attachment by id",
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Get attachment by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Attachment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Attachment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById attachment by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "UpdateById attachment by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Attachment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Attachment name and team information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateAttachmentParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete attachments by id",
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Delete attachments by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Attachment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Administrator logout",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Administrator logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/captcha": {
+            "post": {
+                "description": "Generate user login captcha",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public",
+                    "auth"
+                ],
+                "summary": "Generate user login captcha",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CaptchaResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/category": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create category",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "Create category",
+                "parameters": [
+                    {
+                        "description": "Category information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Category"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/category/all": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get all categories",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get all categories",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Show number of posts",
+                        "name": "more",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.CategoryMoreResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/category/batch": {
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById category in batches using the id list",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "UpdateById category in batches using the id list",
+                "parameters": [
+                    {
+                        "description": "Category information list",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get category by id",
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get category by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Category"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Update category by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "Update category by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Category information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete category by id",
+                "tags": [
+                    "category"
+                ],
+                "summary": "Delete category by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/list": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Page for a list of comments",
+                "tags": [
+                    "comment"
+                ],
+                "summary": "Page for a list of comments",
+                "parameters": [
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.PageResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "content": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/table.Comment"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/group": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get all admin groups",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get all admin groups",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/table.AdminGroup"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/install": {
+            "post": {
+                "description": "Install a new site",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public",
+                    "site"
+                ],
+                "summary": "Install a new site",
+                "parameters": [
+                    {
+                        "description": "Site and administrator information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SiteInstallParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/is_installed": {
+            "get": {
+                "description": "Check whether the site is installed",
+                "tags": [
+                    "public",
+                    "site"
+                ],
+                "summary": "Check whether the site is installed",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/log/all": {
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete all logs",
+                "tags": [
+                    "log"
+                ],
+                "summary": "Delete all logs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/log/latest": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get the latest logs",
+                "tags": [
+                    "log"
+                ],
+                "summary": "Get the latest logs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Number of logs",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/table.Log"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/log/list": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Page for a list of logs",
+                "tags": [
+                    "log"
+                ],
+                "summary": "Page for a list of logs",
+                "parameters": [
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.PageResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "content": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/table.Log"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/log/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get log by id",
+                "tags": [
+                    "log"
+                ],
+                "summary": "Get log by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Log id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Log"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete log by id",
+                "tags": [
+                    "log"
+                ],
+                "summary": "Delete log by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Log id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Administrator login",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public",
+                    "auth"
+                ],
+                "summary": "Administrator login",
+                "parameters": [
+                    {
+                        "description": "Login user name and password information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AdminLoginParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.TokenResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/menu": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create menu",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Create menu",
+                "parameters": [
+                    {
+                        "description": "Menu information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Menu"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/menu/batch": {
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete menu in batches using the id list",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Delete menu in batches using the id list",
+                "parameters": [
+                    {
+                        "description": "Menu id list",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/menu/team/tree_view": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get the menu for the tree view through team",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Get the menu for the tree view through team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Query team",
+                        "name": "team",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.MenuTreeResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/menu/teams": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get menu for all teams",
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Get menu for all teams",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/menu/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get menu by id",
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Get menu by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Menu"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById menu by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "UpdateById menu by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Menu information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Menu"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete menu by id",
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Delete menu by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/option": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create option",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "option"
+                ],
+                "summary": "Create option",
+                "parameters": [
+                    {
+                        "description": "Option information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Option"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Option"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/option/all": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get all options",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "option"
+                ],
+                "summary": "Get all options",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/table.Option"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/option/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get option by id",
+                "tags": [
+                    "option"
+                ],
+                "summary": "Get option by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Option id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Option"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById option by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "option"
+                ],
+                "summary": "UpdateById option by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Option id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Option information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Option"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete option by id",
+                "tags": [
+                    "option"
+                ],
+                "summary": "Delete option by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Option id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/post": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create post",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "summary": "Create post",
+                "parameters": [
+                    {
+                        "description": "Post information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateOrUpdatePostParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/batch": {
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete post in batches using the id list",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "summary": "Delete post in batches using the id list",
+                "parameters": [
+                    {
+                        "description": "Post id list",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/latest": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get the latest post",
+                "tags": [
+                    "post"
+                ],
+                "summary": "Get the latest post",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Number of posts",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/table.Post"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/post/list": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Page for a list of posts",
+                "tags": [
+                    "post"
+                ],
+                "summary": "Page for a list of posts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "more",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "statuses",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.PageResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "content": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.PostResponse"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/post/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get post by id",
+                "tags": [
+                    "post"
+                ],
+                "summary": "Get post by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.PostResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Update post by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "summary": "Update post by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Post information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateOrUpdatePostParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete post by id",
+                "tags": [
+                    "post"
+                ],
+                "summary": "Delete post by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/{id}/content": {
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Update content post by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "summary": "Update post content by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Post content",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdatePostContentPAram"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/{id}/status/{status}": {
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Update post status by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "summary": "Update post status by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Post new status",
+                        "name": "status",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh_token": {
+            "post": {
+                "description": "Refreshing an Administrator token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public",
+                    "auth"
+                ],
+                "summary": "Refreshing an Administrator token",
+                "parameters": [
+                    {
+                        "description": "Refresh token",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RefreshTokenParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.TokenResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/sheet": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create sheet",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Create sheet",
+                "parameters": [
+                    {
+                        "description": "Sheet information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateOrUpdateSheetParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sheet/list": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Page for a list of sheets",
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Page for a list of sheets",
+                "parameters": [
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.PageResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "content": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/table.Post"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/sheet/theme/all": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme all built-in sheets",
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Get theme all built-in sheets",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.ThemeSheetResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/sheet/theme/setting/{sheet}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme sheet configuration by sheet id",
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Get theme sheet configuration by sheet id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sheet name",
+                        "name": "sheet",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Save theme sheet configuration",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Save theme sheet configuration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sheet name",
+                        "name": "sheet",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Theme configuration information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sheet/theme/setting/{sheet}/schema": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme sheet schema by sheet id",
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Get theme sheet schema by sheet id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sheet name",
+                        "name": "sheet",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/yaml.ThemeSettingSchemaGroup"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/sheet/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get sheet by id",
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Get sheet by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Sheet id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.SheetResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Update sheet by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Update sheet by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Sheet id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Sheet information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateOrUpdateSheetParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete sheet by id",
+                "tags": [
+                    "sheet"
+                ],
+                "summary": "Delete sheet by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Sheet id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/site": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get site by id",
+                "tags": [
+                    "site"
+                ],
+                "summary": "Get site by id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Site"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/site/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById site by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "site"
+                ],
+                "summary": "UpdateById site by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Site id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Site information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Site"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistic": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get statistics information",
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "Get statistics information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.StatisticResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/statistic/admin": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get statistics and administrator information",
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "Get statistics and administrator information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.StatisticWithAdminResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/system/environments": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Gets environments info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "Gets environments info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.EnvironmentResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/tag": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Create tag",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Create tag",
+                "parameters": [
+                    {
+                        "description": "Tag information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Tag"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Tag"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/all": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get all tags",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Get all tags",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Show number of posts",
+                        "name": "more",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.TagMoreResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get category by id",
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Get tag by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/table.Tag"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById tag by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "UpdateById tag by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Tag information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.Tag"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete tag by id",
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Delete tag by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/activation": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme by activated",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme by activated",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/yaml.ThemeRepository"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/all": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get all theme",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get all theme",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/yaml.ThemeRepository"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/file/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme template files by id",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme template files by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.ThemeFileResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/file/{id}/content": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme template files content by path",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme template files content by path",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Theme template file path",
+                        "name": "path",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Update theme template files content by path",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Update theme template files content by path",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Theme template file content",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateThemeFileContentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/setting/activation": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme configuration by activated",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme configuration by activated",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "object",
+                                                "additionalProperties": true
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/setting/activation/schema": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme schema by activated",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme schema by activated",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/yaml.ThemeSettingSchemaGroup"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/setting/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme configuration by id",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme configuration by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "object",
+                                                "additionalProperties": true
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Save theme configuration",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Save theme configuration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Theme configuration information",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/setting/{id}/schema": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme schema by id",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme schema by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/yaml.ThemeSettingSchemaGroup"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/template/{type}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme template schema by template type",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme template schema by template type",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "template type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/yaml.ThemeTemplateSchemaGroup"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/upload": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Upload theme",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Upload theme",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "File stream",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/yaml.ThemeRepository"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/upload/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "UpdateById theme by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "theme"
+                ],
+                "summary": "UpdateById theme by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "File stream",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/yaml.ThemeRepository"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Get theme by id",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Get theme by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/yaml.ThemeRepository"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Delete theme by id",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Delete theme by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Deleting a theme configuration",
+                        "name": "deleteSettings",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/theme/{id}/activation": {
+            "post": {
+                "security": [
+                    {
+                        "admin": []
+                    }
+                ],
+                "description": "Activate theme",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "theme"
+                ],
+                "summary": "Activate theme",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/yaml.ThemeRepository"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "common.Permission": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "权限描述",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "权限id",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "权限名称",
+                    "type": "string"
+                }
+            }
+        },
+        "common.PermissionGroup": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "权限名称",
+                    "type": "string"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/common.Permission"
+                    }
+                }
+            }
+        },
+        "request.AdminLoginParam": {
+            "type": "object",
+            "required": [
+                "captcha",
+                "captchaId",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "captcha": {
+                    "description": "验证码",
+                    "type": "string"
+                },
+                "captchaId": {
+                    "description": "验证码ID",
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 8
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50
+                }
+            }
+        },
+        "request.BatchUpdateAttachmentParam": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "description": "Name 不需要允许空字符串",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "team": {
+                    "description": "Team 需要允许空字符串",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CreateOrUpdatePostParam": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "categoryIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "fullPath": {
+                    "description": "文章链接",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isTop": {
+                    "type": "boolean"
+                },
+                "metaDescription": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metaKeywords": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.MetaParam"
+                    }
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "tagIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "template": {
+                    "type": "string",
+                    "maxLength": 63
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "visits": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "wordCount": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "request.CreateOrUpdateSheetParam": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "fullPath": {
+                    "description": "文章链接",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isTop": {
+                    "type": "boolean"
+                },
+                "metaDescription": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metaKeywords": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.MetaParam"
+                    }
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "template": {
+                    "type": "string",
+                    "maxLength": 63
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "visits": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "wordCount": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "request.MetaParam": {
+            "type": "object",
+            "properties": {
+                "metaKey": {
+                    "type": "string"
+                },
+                "metaValue": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.RefreshTokenParam": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.SiteInstallParam": {
+            "type": "object",
+            "required": [
+                "nickname",
+                "password",
+                "siteUrl",
+                "username"
+            ],
+            "properties": {
+                "avatar": {
+                    "description": "头像",
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "favicon": {
+                    "type": "string",
+                    "maxLength": 511
+                },
+                "groupId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "主键",
+                    "type": "integer"
+                },
+                "logo": {
+                    "type": "string",
+                    "maxLength": 511
+                },
+                "metaDescription": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metaKeywords": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "nickname": {
+                    "description": "昵称",
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 8
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "siteName": {
+                    "type": "string"
+                },
+                "siteUrl": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "subtitle": {
+                    "type": "string"
+                },
+                "themeId": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string",
+                    "maxLength": 50
+                }
+            }
+        },
+        "request.UpdateAdminParam": {
+            "type": "object",
+            "required": [
+                "nickname",
+                "username"
+            ],
+            "properties": {
+                "avatar": {
+                    "description": "头像",
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nickname": {
+                    "description": "昵称",
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string",
+                    "maxLength": 50
+                }
+            }
+        },
+        "request.UpdateAttachmentParam": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name 不需要允许空字符串",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "team": {
+                    "description": "Team 需要允许空字符串",
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdatePasswordParam": {
+            "type": "object",
+            "required": [
+                "newPassword",
+                "oldPassword"
+            ],
+            "properties": {
+                "newPassword": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 8
+                },
+                "oldPassword": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 8
+                }
+            }
+        },
+        "request.UpdatePostContentPAram": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateThemeFileContentRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CaptchaResponse": {
+            "type": "object",
+            "properties": {
+                "captchaId": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CategoryMoreResponse": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "parentId": {
+                    "type": "integer"
+                },
+                "postCount": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.EnvironmentResponse": {
+            "type": "object",
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string"
+                },
+                "startTime": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.MenuTreeResponse": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MenuTreeResponse"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "parentId": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "target": {
+                    "type": "string",
+                    "maxLength": 15
+                },
+                "team": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "url": {
+                    "type": "string",
+                    "maxLength": 511
+                }
+            }
+        },
+        "response.MetaResponse": {
+            "type": "object",
+            "properties": {
+                "metaKey": {
+                    "type": "string"
+                },
+                "metaValue": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.PageResponse": {
+            "type": "object",
+            "properties": {
+                "content": {},
+                "hasNext": {
+                    "type": "boolean"
+                },
+                "hasPrevious": {
+                    "type": "boolean"
+                },
+                "page": {
+                    "description": "当前页数，从0开始",
+                    "type": "integer"
+                },
+                "pages": {
+                    "description": "总页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总消息数",
+                    "type": "integer"
+                }
+            }
+        },
+        "response.PostResponse": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/table.Category"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "fullPath": {
+                    "description": "文章链接",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isTop": {
+                    "type": "boolean"
+                },
+                "metaDescription": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metaKeywords": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MetaResponse"
+                    }
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/table.Tag"
+                    }
+                },
+                "template": {
+                    "type": "string",
+                    "maxLength": 63
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "visits": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "wordCount": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.SheetResponse": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "fullPath": {
+                    "description": "文章链接",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isTop": {
+                    "type": "boolean"
+                },
+                "metaDescription": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metaKeywords": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MetaResponse"
+                    }
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "template": {
+                    "type": "string",
+                    "maxLength": 63
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "visits": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "wordCount": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "response.StatisticResponse": {
+            "type": "object",
+            "properties": {
+                "commentCount": {
+                    "type": "integer"
+                },
+                "postCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.StatisticWithAdminResponse": {
+            "type": "object",
+            "properties": {
+                "admin": {
+                    "$ref": "#/definitions/table.Admin"
+                },
+                "commentCount": {
+                    "type": "integer"
+                },
+                "postCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.TagMoreResponse": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "postCount": {
+                    "type": "integer"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.ThemeFileResponse": {
+            "type": "object",
+            "properties": {
+                "editable": {
+                    "type": "boolean"
+                },
+                "isFile": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "node": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.ThemeFileResponse"
+                    }
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.ThemeSheetResponse": {
+            "type": "object",
+            "properties": {
+                "fullPath": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "id": {
+                    "type": "string",
+                    "maxLength": 63
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            }
+        },
+        "response.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expired_in": {
+                    "type": "integer"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "table.Admin": {
+            "type": "object",
+            "required": [
+                "nickname",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "avatar": {
+                    "description": "头像",
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "groupId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "主键",
+                    "type": "integer"
+                },
+                "nickname": {
+                    "description": "昵称",
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 8
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string",
+                    "maxLength": 50
+                }
+            }
+        },
+        "table.AdminGroup": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "id": {
+                    "description": "主键",
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "table.Attachment": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "height": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "mimeType": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "path": {
+                    "type": "string"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "suffix": {
+                    "type": "string"
+                },
+                "team": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "thumbPath": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "integer"
+                }
+            }
+        },
+        "table.Category": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "parentId": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "table.Comment": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isAdmin": {
+                    "type": "boolean"
+                },
+                "parentId": {
+                    "type": "integer"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "subjectId": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "table.Log": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ipAddress": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "table.Menu": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "parentId": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "target": {
+                    "type": "string",
+                    "maxLength": 15
+                },
+                "team": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "url": {
+                    "type": "string",
+                    "maxLength": 511
+                }
+            }
+        },
+        "table.Option": {
+            "type": "object",
+            "required": [
+                "optionKey"
+            ],
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "主键",
+                    "type": "integer"
+                },
+                "optionKey": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "optionValue": {
+                    "type": "string"
+                },
+                "siteId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "table.Post": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "fullPath": {
+                    "description": "文章链接",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isTop": {
+                    "type": "boolean"
+                },
+                "metaDescription": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metaKeywords": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "template": {
+                    "type": "string",
+                    "maxLength": 63
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "visits": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "wordCount": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "table.Site": {
+            "type": "object",
+            "required": [
+                "siteUrl"
+            ],
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "favicon": {
+                    "type": "string",
+                    "maxLength": 511
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "logo": {
+                    "type": "string",
+                    "maxLength": 511
+                },
+                "metaDescription": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "metaKeywords": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "siteName": {
+                    "type": "string"
+                },
+                "siteUrl": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "subtitle": {
+                    "type": "string"
+                },
+                "themeId": {
+                    "type": "string"
+                }
+            }
+        },
+        "table.Tag": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 127
+                },
+                "siteId": {
+                    "type": "integer"
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "maxLength": 1023
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "yaml.ThemeAuthor": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "website": {
+                    "type": "string"
+                }
+            }
+        },
+        "yaml.ThemeRepository": {
+            "type": "object",
+            "properties": {
+                "activated": {
+                    "type": "boolean"
+                },
+                "author": {
+                    "$ref": "#/definitions/yaml.ThemeAuthor"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "require": {
+                    "type": "string"
+                },
+                "screenshots": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "website": {
+                    "type": "string"
+                }
+            }
+        },
+        "yaml.ThemeSettingItem": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/yaml.ThemeSettingItem"
+                    }
+                },
+                "dataType": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/yaml.ThemeSettingItemOption"
+                    }
+                },
+                "placeholder": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {}
+            }
+        },
+        "yaml.ThemeSettingItemOption": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "value": {}
+            }
+        },
+        "yaml.ThemeSettingSchemaGroup": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/yaml.ThemeSettingItem"
+                    }
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "yaml.ThemeTemplateMeta": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "placeholder": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "yaml.ThemeTemplateSchemaGroup": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "meta": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/yaml.ThemeTemplateMeta"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "admin": {
+            "type": "apiKey",
+            "name": "Admin-Authorization",
+            "in": "header"
+        }
+    }
+}

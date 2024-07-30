@@ -1,0 +1,25 @@
+{
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Aurora 建站",
+        "title": "Aurora Content-API 文档",
+        "contact": {},
+        "version": "v0.0.1"
+    },
+    "host": "localhost:8888",
+    "paths": {},
+    "securityDefinitions": {
+        "content": {
+            "type": "apiKey",
+            "name": "Content-Authorization",
+            "in": "header"
+        }
+    }
+}

@@ -1,0 +1,3353 @@
+basePath: /api/admin
+definitions:
+  common.Permission:
+    properties:
+      description:
+        description: 权限描述
+        type: string
+      id:
+        description: 权限id
+        type: string
+      name:
+        description: 权限名称
+        type: string
+    type: object
+  common.PermissionGroup:
+    properties:
+      name:
+        description: 权限名称
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/common.Permission'
+        type: array
+    type: object
+  request.AdminLoginParam:
+    properties:
+      captcha:
+        description: 验证码
+        type: string
+      captchaId:
+        description: 验证码ID
+        type: string
+      password:
+        maxLength: 100
+        minLength: 8
+        type: string
+      username:
+        maxLength: 50
+        type: string
+    required:
+    - captcha
+    - captchaId
+    - password
+    - username
+    type: object
+  request.BatchUpdateAttachmentParam:
+    properties:
+      id:
+        type: integer
+      ids:
+        items:
+          type: integer
+        type: array
+      name:
+        description: Name 不需要允许空字符串
+        maxLength: 255
+        type: string
+      team:
+        description: Team 需要允许空字符串
+        type: string
+    type: object
+  request.CreateOrUpdatePostParam:
+    properties:
+      alias:
+        maxLength: 255
+        type: string
+      categoryIds:
+        items:
+          type: integer
+        type: array
+      content:
+        type: string
+      createTime:
+        type: string
+      fullPath:
+        description: 文章链接
+        type: string
+      id:
+        type: integer
+      isTop:
+        type: boolean
+      metaDescription:
+        maxLength: 1023
+        type: string
+      metaKeywords:
+        maxLength: 1023
+        type: string
+      metas:
+        items:
+          $ref: '#/definitions/request.MetaParam'
+        type: array
+      siteId:
+        type: integer
+      status:
+        type: integer
+      summary:
+        type: string
+      tagIds:
+        items:
+          type: integer
+        type: array
+      template:
+        maxLength: 63
+        type: string
+      thumbnail:
+        maxLength: 1023
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      type:
+        type: integer
+      updateTime:
+        type: string
+      visits:
+        minimum: 0
+        type: integer
+      wordCount:
+        minimum: 0
+        type: integer
+    required:
+    - title
+    type: object
+  request.CreateOrUpdateSheetParam:
+    properties:
+      alias:
+        maxLength: 255
+        type: string
+      content:
+        type: string
+      createTime:
+        type: string
+      fullPath:
+        description: 文章链接
+        type: string
+      id:
+        type: integer
+      isTop:
+        type: boolean
+      metaDescription:
+        maxLength: 1023
+        type: string
+      metaKeywords:
+        maxLength: 1023
+        type: string
+      metas:
+        items:
+          $ref: '#/definitions/request.MetaParam'
+        type: array
+      siteId:
+        type: integer
+      status:
+        type: integer
+      summary:
+        type: string
+      template:
+        maxLength: 63
+        type: string
+      thumbnail:
+        maxLength: 1023
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      type:
+        type: integer
+      updateTime:
+        type: string
+      visits:
+        minimum: 0
+        type: integer
+      wordCount:
+        minimum: 0
+        type: integer
+    required:
+    - title
+    type: object
+  request.MetaParam:
+    properties:
+      metaKey:
+        type: string
+      metaValue:
+        type: string
+    type: object
+  request.RefreshTokenParam:
+    properties:
+      token:
+        type: string
+    type: object
+  request.SiteInstallParam:
+    properties:
+      avatar:
+        description: 头像
+        maxLength: 1023
+        type: string
+      createTime:
+        type: string
+      description:
+        description: 描述
+        maxLength: 1023
+        type: string
+      email:
+        description: 邮箱
+        maxLength: 127
+        type: string
+      favicon:
+        maxLength: 511
+        type: string
+      groupId:
+        type: integer
+      id:
+        description: 主键
+        type: integer
+      logo:
+        maxLength: 511
+        type: string
+      metaDescription:
+        maxLength: 1023
+        type: string
+      metaKeywords:
+        maxLength: 1023
+        type: string
+      nickname:
+        description: 昵称
+        maxLength: 127
+        type: string
+      password:
+        maxLength: 100
+        minLength: 8
+        type: string
+      siteId:
+        type: integer
+      siteName:
+        type: string
+      siteUrl:
+        maxLength: 127
+        type: string
+      subtitle:
+        type: string
+      themeId:
+        type: string
+      updateTime:
+        type: string
+      username:
+        description: 用户名
+        maxLength: 50
+        type: string
+    required:
+    - nickname
+    - password
+    - siteUrl
+    - username
+    type: object
+  request.UpdateAdminParam:
+    properties:
+      avatar:
+        description: 头像
+        maxLength: 1023
+        type: string
+      description:
+        description: 描述
+        maxLength: 1023
+        type: string
+      email:
+        description: 邮箱
+        maxLength: 127
+        type: string
+      id:
+        type: integer
+      nickname:
+        description: 昵称
+        maxLength: 127
+        type: string
+      username:
+        description: 用户名
+        maxLength: 50
+        type: string
+    required:
+    - nickname
+    - username
+    type: object
+  request.UpdateAttachmentParam:
+    properties:
+      id:
+        type: integer
+      name:
+        description: Name 不需要允许空字符串
+        maxLength: 255
+        type: string
+      team:
+        description: Team 需要允许空字符串
+        type: string
+    type: object
+  request.UpdatePasswordParam:
+    properties:
+      newPassword:
+        maxLength: 100
+        minLength: 8
+        type: string
+      oldPassword:
+        maxLength: 100
+        minLength: 8
+        type: string
+    required:
+    - newPassword
+    - oldPassword
+    type: object
+  request.UpdatePostContentPAram:
+    properties:
+      content:
+        type: string
+    type: object
+  request.UpdateThemeFileContentRequest:
+    properties:
+      content:
+        type: string
+      path:
+        type: string
+    type: object
+  response.CaptchaResponse:
+    properties:
+      captchaId:
+        type: string
+      path:
+        type: string
+    type: object
+  response.CategoryMoreResponse:
+    properties:
+      createTime:
+        type: string
+      description:
+        maxLength: 1023
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 127
+        type: string
+      parentId:
+        type: integer
+      postCount:
+        type: integer
+      priority:
+        type: integer
+      siteId:
+        type: integer
+      thumbnail:
+        maxLength: 1023
+        type: string
+      updateTime:
+        type: string
+    required:
+    - name
+    type: object
+  response.EnvironmentResponse:
+    properties:
+      database:
+        type: string
+      mode:
+        type: string
+      startTime:
+        type: integer
+      version:
+        type: string
+    type: object
+  response.MenuTreeResponse:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/response.MenuTreeResponse'
+        type: array
+      id:
+        type: integer
+      name:
+        maxLength: 50
+        type: string
+      parentId:
+        type: integer
+      priority:
+        type: integer
+      siteId:
+        type: integer
+      target:
+        maxLength: 15
+        type: string
+      team:
+        maxLength: 30
+        type: string
+      url:
+        maxLength: 511
+        type: string
+    type: object
+  response.MetaResponse:
+    properties:
+      metaKey:
+        type: string
+      metaValue:
+        type: string
+    type: object
+  response.PageResponse:
+    properties:
+      content: {}
+      hasNext:
+        type: boolean
+      hasPrevious:
+        type: boolean
+      page:
+        description: 当前页数，从0开始
+        type: integer
+      pages:
+        description: 总页数
+        type: integer
+      total:
+        description: 总消息数
+        type: integer
+    type: object
+  response.PostResponse:
+    properties:
+      alias:
+        maxLength: 255
+        type: string
+      categories:
+        items:
+          $ref: '#/definitions/table.Category'
+        type: array
+      content:
+        type: string
+      createTime:
+        type: string
+      fullPath:
+        description: 文章链接
+        type: string
+      id:
+        type: integer
+      isTop:
+        type: boolean
+      metaDescription:
+        maxLength: 1023
+        type: string
+      metaKeywords:
+        maxLength: 1023
+        type: string
+      metas:
+        items:
+          $ref: '#/definitions/response.MetaResponse'
+        type: array
+      siteId:
+        type: integer
+      status:
+        type: integer
+      summary:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/table.Tag'
+        type: array
+      template:
+        maxLength: 63
+        type: string
+      thumbnail:
+        maxLength: 1023
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      type:
+        type: integer
+      updateTime:
+        type: string
+      visits:
+        minimum: 0
+        type: integer
+      wordCount:
+        minimum: 0
+        type: integer
+    required:
+    - title
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  response.SheetResponse:
+    properties:
+      alias:
+        maxLength: 255
+        type: string
+      content:
+        type: string
+      createTime:
+        type: string
+      fullPath:
+        description: 文章链接
+        type: string
+      id:
+        type: integer
+      isTop:
+        type: boolean
+      metaDescription:
+        maxLength: 1023
+        type: string
+      metaKeywords:
+        maxLength: 1023
+        type: string
+      metas:
+        items:
+          $ref: '#/definitions/response.MetaResponse'
+        type: array
+      siteId:
+        type: integer
+      status:
+        type: integer
+      summary:
+        type: string
+      template:
+        maxLength: 63
+        type: string
+      thumbnail:
+        maxLength: 1023
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      type:
+        type: integer
+      updateTime:
+        type: string
+      visits:
+        minimum: 0
+        type: integer
+      wordCount:
+        minimum: 0
+        type: integer
+    required:
+    - title
+    type: object
+  response.StatisticResponse:
+    properties:
+      commentCount:
+        type: integer
+      postCount:
+        type: integer
+    type: object
+  response.StatisticWithAdminResponse:
+    properties:
+      admin:
+        $ref: '#/definitions/table.Admin'
+      commentCount:
+        type: integer
+      postCount:
+        type: integer
+    type: object
+  response.TagMoreResponse:
+    properties:
+      color:
+        maxLength: 25
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 127
+        type: string
+      postCount:
+        type: integer
+      siteId:
+        type: integer
+      thumbnail:
+        maxLength: 1023
+        type: string
+      updateTime:
+        type: string
+    required:
+    - name
+    type: object
+  response.ThemeFileResponse:
+    properties:
+      editable:
+        type: boolean
+      isFile:
+        type: boolean
+      name:
+        type: string
+      node:
+        items:
+          $ref: '#/definitions/response.ThemeFileResponse'
+        type: array
+      path:
+        type: string
+    type: object
+  response.ThemeSheetResponse:
+    properties:
+      fullPath:
+        maxLength: 255
+        type: string
+      id:
+        maxLength: 63
+        type: string
+      title:
+        maxLength: 255
+        type: string
+    type: object
+  response.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      expired_in:
+        type: integer
+      refresh_token:
+        type: string
+    type: object
+  table.Admin:
+    properties:
+      avatar:
+        description: 头像
+        maxLength: 1023
+        type: string
+      createTime:
+        type: string
+      description:
+        description: 描述
+        maxLength: 1023
+        type: string
+      email:
+        description: 邮箱
+        maxLength: 127
+        type: string
+      groupId:
+        type: integer
+      id:
+        description: 主键
+        type: integer
+      nickname:
+        description: 昵称
+        maxLength: 127
+        type: string
+      password:
+        maxLength: 100
+        minLength: 8
+        type: string
+      siteId:
+        type: integer
+      updateTime:
+        type: string
+      username:
+        description: 用户名
+        maxLength: 50
+        type: string
+    required:
+    - nickname
+    - password
+    - username
+    type: object
+  table.AdminGroup:
+    properties:
+      createTime:
+        type: string
+      description:
+        maxLength: 1023
+        type: string
+      id:
+        description: 主键
+        type: integer
+      name:
+        maxLength: 127
+        type: string
+      permissions:
+        items:
+          type: string
+        type: array
+      siteId:
+        type: integer
+      updateTime:
+        type: string
+    required:
+    - name
+    type: object
+  table.Attachment:
+    properties:
+      createTime:
+        type: string
+      height:
+        type: integer
+      id:
+        type: integer
+      mimeType:
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      path:
+        type: string
+      siteId:
+        type: integer
+      size:
+        type: integer
+      suffix:
+        type: string
+      team:
+        maxLength: 30
+        type: string
+      thumbPath:
+        type: string
+      width:
+        type: integer
+    type: object
+  table.Category:
+    properties:
+      createTime:
+        type: string
+      description:
+        maxLength: 1023
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 127
+        type: string
+      parentId:
+        type: integer
+      priority:
+        type: integer
+      siteId:
+        type: integer
+      thumbnail:
+        maxLength: 1023
+        type: string
+      updateTime:
+        type: string
+    required:
+    - name
+    type: object
+  table.Comment:
+    properties:
+      content:
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      isAdmin:
+        type: boolean
+      parentId:
+        type: integer
+      siteId:
+        type: integer
+      status:
+        type: integer
+      subjectId:
+        type: integer
+      type:
+        type: integer
+    type: object
+  table.Log:
+    properties:
+      content:
+        maxLength: 1023
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      ipAddress:
+        maxLength: 127
+        type: string
+      siteId:
+        type: integer
+      type:
+        type: integer
+      userId:
+        type: integer
+    type: object
+  table.Menu:
+    properties:
+      id:
+        type: integer
+      name:
+        maxLength: 50
+        type: string
+      parentId:
+        type: integer
+      priority:
+        type: integer
+      siteId:
+        type: integer
+      target:
+        maxLength: 15
+        type: string
+      team:
+        maxLength: 30
+        type: string
+      url:
+        maxLength: 511
+        type: string
+    type: object
+  table.Option:
+    properties:
+      createTime:
+        type: string
+      id:
+        description: 主键
+        type: integer
+      optionKey:
+        maxLength: 255
+        type: string
+      optionValue:
+        type: string
+      siteId:
+        type: integer
+    required:
+    - optionKey
+    type: object
+  table.Post:
+    properties:
+      alias:
+        maxLength: 255
+        type: string
+      content:
+        type: string
+      createTime:
+        type: string
+      fullPath:
+        description: 文章链接
+        type: string
+      id:
+        type: integer
+      isTop:
+        type: boolean
+      metaDescription:
+        maxLength: 1023
+        type: string
+      metaKeywords:
+        maxLength: 1023
+        type: string
+      siteId:
+        type: integer
+      status:
+        type: integer
+      summary:
+        type: string
+      template:
+        maxLength: 63
+        type: string
+      thumbnail:
+        maxLength: 1023
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      type:
+        type: integer
+      updateTime:
+        type: string
+      visits:
+        minimum: 0
+        type: integer
+      wordCount:
+        minimum: 0
+        type: integer
+    required:
+    - title
+    type: object
+  table.Site:
+    properties:
+      createTime:
+        type: string
+      favicon:
+        maxLength: 511
+        type: string
+      id:
+        type: integer
+      logo:
+        maxLength: 511
+        type: string
+      metaDescription:
+        maxLength: 1023
+        type: string
+      metaKeywords:
+        maxLength: 1023
+        type: string
+      siteName:
+        type: string
+      siteUrl:
+        maxLength: 127
+        type: string
+      subtitle:
+        type: string
+      themeId:
+        type: string
+    required:
+    - siteUrl
+    type: object
+  table.Tag:
+    properties:
+      color:
+        maxLength: 25
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        maxLength: 127
+        type: string
+      siteId:
+        type: integer
+      thumbnail:
+        maxLength: 1023
+        type: string
+      updateTime:
+        type: string
+    required:
+    - name
+    type: object
+  yaml.ThemeAuthor:
+    properties:
+      avatar:
+        type: string
+      name:
+        type: string
+      website:
+        type: string
+    type: object
+  yaml.ThemeRepository:
+    properties:
+      activated:
+        type: boolean
+      author:
+        $ref: '#/definitions/yaml.ThemeAuthor'
+      description:
+        type: string
+      id:
+        type: string
+      logo:
+        type: string
+      name:
+        type: string
+      require:
+        type: string
+      screenshots:
+        type: string
+      version:
+        type: string
+      website:
+        type: string
+    type: object
+  yaml.ThemeSettingItem:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/yaml.ThemeSettingItem'
+        type: array
+      dataType:
+        type: string
+      description:
+        type: string
+      label:
+        type: string
+      name:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/yaml.ThemeSettingItemOption'
+        type: array
+      placeholder:
+        type: string
+      type:
+        type: string
+      value: {}
+    type: object
+  yaml.ThemeSettingItemOption:
+    properties:
+      label:
+        type: string
+      value: {}
+    type: object
+  yaml.ThemeSettingSchemaGroup:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/yaml.ThemeSettingItem'
+        type: array
+      label:
+        type: string
+      name:
+        type: string
+    type: object
+  yaml.ThemeTemplateMeta:
+    properties:
+      label:
+        type: string
+      name:
+        type: string
+      placeholder:
+        type: string
+      value:
+        type: string
+    type: object
+  yaml.ThemeTemplateSchemaGroup:
+    properties:
+      label:
+        type: string
+      meta:
+        items:
+          $ref: '#/definitions/yaml.ThemeTemplateMeta'
+        type: array
+      name:
+        type: string
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: 361654768@qq.com
+    name: nineya
+    url: https://www.nineya.com
+  description: Aurora 建站
+  title: Aurora Admin-API 文档
+  version: v0.0.1
+paths:
+  /admin:
+    post:
+      consumes:
+      - application/json
+      description: Create admin
+      parameters:
+      - description: Admin information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Admin'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Admin'
+              type: object
+      security:
+      - admin: []
+      summary: Create admin
+      tags:
+      - admin
+  /admin/{id}:
+    delete:
+      description: Delete admin by id
+      parameters:
+      - description: admin id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete admin by id
+      tags:
+      - admin
+  /admin/all:
+    get:
+      consumes:
+      - application/json
+      description: Get admin list by group id
+      parameters:
+      - description: Admin group id
+        in: query
+        name: group
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/table.Admin'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get admin list by group id
+      tags:
+      - admin
+  /admin/group:
+    post:
+      consumes:
+      - application/json
+      description: Create admin group
+      parameters:
+      - description: Admin group information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.AdminGroup'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.AdminGroup'
+              type: object
+      security:
+      - admin: []
+      summary: Create admin group
+      tags:
+      - admin
+  /admin/group/{id}:
+    delete:
+      description: Delete admin group by id
+      parameters:
+      - description: Admin group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete admin group by id
+      tags:
+      - admin
+    get:
+      description: Get admin group by id
+      parameters:
+      - description: Admin group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.AdminGroup'
+              type: object
+      security:
+      - admin: []
+      summary: Get admin group by id
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: UpdateById admin group by id
+      parameters:
+      - description: Admin group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.AdminGroup'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById admin group by id
+      tags:
+      - admin
+  /admin/list:
+    get:
+      description: Page for a list of admins
+      parameters:
+      - in: query
+        minimum: 0
+        name: page
+        type: integer
+      - in: query
+        minimum: 1
+        name: size
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.PageResponse'
+                  - properties:
+                      content:
+                        items:
+                          $ref: '#/definitions/table.Admin'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - admin: []
+      summary: Page for a list of admins
+      tags:
+      - admin
+  /admin/profiles:
+    get:
+      description: Get admin profiles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Admin'
+              type: object
+      security:
+      - admin: []
+      summary: Get admin profiles
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: UpdateById admin profiles
+      parameters:
+      - description: admin information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateAdminParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById admin profiles
+      tags:
+      - admin
+  /admin/profiles/password:
+    put:
+      consumes:
+      - application/json
+      description: UpdateById admin password
+      parameters:
+      - description: admin old and new password
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePasswordParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - admin: []
+      summary: UpdateById admin password
+      tags:
+      - admin
+  /attachment/{id}:
+    delete:
+      description: Delete attachments by id
+      parameters:
+      - description: Attachment id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete attachments by id
+      tags:
+      - attachment
+    get:
+      description: Get attachment by id
+      parameters:
+      - description: Attachment id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Attachment'
+              type: object
+      security:
+      - admin: []
+      summary: Get attachment by id
+      tags:
+      - attachment
+    put:
+      consumes:
+      - application/json
+      description: UpdateById attachment by id
+      parameters:
+      - description: Attachment id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Attachment name and team information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateAttachmentParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById attachment by id
+      tags:
+      - attachment
+  /attachment/batch:
+    delete:
+      consumes:
+      - application/json
+      description: Delete attachments in batches using the id list
+      parameters:
+      - description: Attachment id list
+        in: body
+        name: param
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete attachments in batches using the id list
+      tags:
+      - attachment
+    put:
+      consumes:
+      - application/json
+      description: UpdateById attachments in batches using the id list
+      parameters:
+      - description: Attachment name and team information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.BatchUpdateAttachmentParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById attachments in batches using the id list
+      tags:
+      - attachment
+  /attachment/list:
+    get:
+      description: Page for a list of attachments
+      parameters:
+      - in: query
+        name: keyword
+        type: string
+      - in: query
+        minimum: 0
+        name: page
+        type: integer
+      - in: query
+        minimum: 1
+        name: size
+        required: true
+        type: integer
+      - in: query
+        maxLength: 30
+        name: team
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.PageResponse'
+                  - properties:
+                      content:
+                        items:
+                          $ref: '#/definitions/table.Attachment'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - admin: []
+      summary: Page for a list of attachments
+      tags:
+      - attachment
+  /attachment/mime_types:
+    get:
+      description: Get attachment for all mimeTypes
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get attachment for all mimeTypes
+      tags:
+      - attachment
+  /attachment/teams:
+    get:
+      description: Get attachments for all teams
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get attachments for all teams
+      tags:
+      - attachment
+  /attachment/upload:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Upload attachment
+      parameters:
+      - description: File stream
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Attachment team
+        in: formData
+        name: team
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Attachment'
+              type: object
+      security:
+      - admin: []
+      summary: Upload attachment
+      tags:
+      - attachment
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Administrator logout
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Administrator logout
+      tags:
+      - auth
+  /captcha:
+    post:
+      consumes:
+      - application/json
+      description: Generate user login captcha
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CaptchaResponse'
+              type: object
+      summary: Generate user login captcha
+      tags:
+      - public
+      - auth
+  /category:
+    post:
+      consumes:
+      - application/json
+      description: Create category
+      parameters:
+      - description: Category information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Category'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Category'
+              type: object
+      security:
+      - admin: []
+      summary: Create category
+      tags:
+      - category
+  /category/{id}:
+    delete:
+      description: Delete category by id
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete category by id
+      tags:
+      - category
+    get:
+      description: Get category by id
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Category'
+              type: object
+      security:
+      - admin: []
+      summary: Get category by id
+      tags:
+      - category
+    put:
+      consumes:
+      - application/json
+      description: Update category by id
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Category'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Update category by id
+      tags:
+      - category
+  /category/all:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories
+      parameters:
+      - description: Show number of posts
+        in: query
+        name: more
+        required: true
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.CategoryMoreResponse'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get all categories
+      tags:
+      - category
+  /category/batch:
+    put:
+      consumes:
+      - application/json
+      description: UpdateById category in batches using the id list
+      parameters:
+      - description: Category information list
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Category'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById category in batches using the id list
+      tags:
+      - category
+  /comment/list:
+    get:
+      description: Page for a list of comments
+      parameters:
+      - in: query
+        minimum: 0
+        name: page
+        type: integer
+      - in: query
+        minimum: 1
+        name: size
+        required: true
+        type: integer
+      - in: query
+        name: status
+        type: string
+      - in: query
+        name: type
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.PageResponse'
+                  - properties:
+                      content:
+                        items:
+                          $ref: '#/definitions/table.Comment'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - admin: []
+      summary: Page for a list of comments
+      tags:
+      - comment
+  /group:
+    get:
+      consumes:
+      - application/json
+      description: Get all admin groups
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/table.AdminGroup'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get all admin groups
+      tags:
+      - admin
+  /install:
+    post:
+      consumes:
+      - application/json
+      description: Install a new site
+      parameters:
+      - description: Site and administrator information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.SiteInstallParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Install a new site
+      tags:
+      - public
+      - site
+  /is_installed:
+    get:
+      description: Check whether the site is installed
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+      summary: Check whether the site is installed
+      tags:
+      - public
+      - site
+  /log/{id}:
+    delete:
+      description: Delete log by id
+      parameters:
+      - description: Log id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete log by id
+      tags:
+      - log
+    get:
+      description: Get log by id
+      parameters:
+      - description: Log id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Log'
+              type: object
+      security:
+      - admin: []
+      summary: Get log by id
+      tags:
+      - log
+  /log/all:
+    delete:
+      description: Delete all logs
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete all logs
+      tags:
+      - log
+  /log/latest:
+    get:
+      description: Get the latest logs
+      parameters:
+      - description: Number of logs
+        in: query
+        name: count
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/table.Log'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get the latest logs
+      tags:
+      - log
+  /log/list:
+    get:
+      description: Page for a list of logs
+      parameters:
+      - in: query
+        minimum: 0
+        name: page
+        type: integer
+      - in: query
+        minimum: 1
+        name: size
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.PageResponse'
+                  - properties:
+                      content:
+                        items:
+                          $ref: '#/definitions/table.Log'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - admin: []
+      summary: Page for a list of logs
+      tags:
+      - log
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Administrator login
+      parameters:
+      - description: Login user name and password information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.AdminLoginParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.TokenResponse'
+              type: object
+      summary: Administrator login
+      tags:
+      - public
+      - auth
+  /menu:
+    post:
+      consumes:
+      - application/json
+      description: Create menu
+      parameters:
+      - description: Menu information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Menu'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Create menu
+      tags:
+      - menu
+  /menu/{id}:
+    delete:
+      description: Delete menu by id
+      parameters:
+      - description: Menu id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete menu by id
+      tags:
+      - menu
+    get:
+      description: Get menu by id
+      parameters:
+      - description: Menu id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Menu'
+              type: object
+      security:
+      - admin: []
+      summary: Get menu by id
+      tags:
+      - menu
+    put:
+      consumes:
+      - application/json
+      description: UpdateById menu by id
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Menu information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Menu'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById menu by id
+      tags:
+      - menu
+  /menu/batch:
+    delete:
+      consumes:
+      - application/json
+      description: Delete menu in batches using the id list
+      parameters:
+      - description: Menu id list
+        in: body
+        name: param
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete menu in batches using the id list
+      tags:
+      - menu
+  /menu/team/tree_view:
+    get:
+      consumes:
+      - application/json
+      description: Get the menu for the tree view through team
+      parameters:
+      - description: Query team
+        in: query
+        name: team
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.MenuTreeResponse'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get the menu for the tree view through team
+      tags:
+      - menu
+  /menu/teams:
+    get:
+      description: Get menu for all teams
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get menu for all teams
+      tags:
+      - menu
+  /option:
+    post:
+      consumes:
+      - application/json
+      description: Create option
+      parameters:
+      - description: Option information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Option'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Option'
+              type: object
+      security:
+      - admin: []
+      summary: Create option
+      tags:
+      - option
+  /option/{id}:
+    delete:
+      description: Delete option by id
+      parameters:
+      - description: Option id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete option by id
+      tags:
+      - option
+    get:
+      description: Get option by id
+      parameters:
+      - description: Option id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Option'
+              type: object
+      security:
+      - admin: []
+      summary: Get option by id
+      tags:
+      - option
+    put:
+      consumes:
+      - application/json
+      description: UpdateById option by id
+      parameters:
+      - description: Option id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Option information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Option'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById option by id
+      tags:
+      - option
+  /option/all:
+    get:
+      consumes:
+      - application/json
+      description: Get all options
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/table.Option'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get all options
+      tags:
+      - option
+  /post:
+    post:
+      consumes:
+      - application/json
+      description: Create post
+      parameters:
+      - description: Post information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateOrUpdatePostParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Create post
+      tags:
+      - post
+  /post/{id}:
+    delete:
+      description: Delete post by id
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete post by id
+      tags:
+      - post
+    get:
+      description: Get post by id
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.PostResponse'
+              type: object
+      security:
+      - admin: []
+      summary: Get post by id
+      tags:
+      - post
+    put:
+      consumes:
+      - application/json
+      description: Update post by id
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Post information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateOrUpdatePostParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Update post by id
+      tags:
+      - post
+  /post/{id}/content:
+    put:
+      consumes:
+      - application/json
+      description: Update content post by id
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Post content
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePostContentPAram'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Update post content by id
+      tags:
+      - post
+  /post/{id}/status/{status}:
+    put:
+      consumes:
+      - application/json
+      description: Update post status by id
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Post new status
+        in: path
+        name: status
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Update post status by id
+      tags:
+      - post
+  /post/batch:
+    delete:
+      consumes:
+      - application/json
+      description: Delete post in batches using the id list
+      parameters:
+      - description: Post id list
+        in: body
+        name: param
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete post in batches using the id list
+      tags:
+      - post
+  /post/latest:
+    get:
+      description: Get the latest post
+      parameters:
+      - description: Number of posts
+        in: query
+        name: count
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/table.Post'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get the latest post
+      tags:
+      - post
+  /post/list:
+    get:
+      description: Page for a list of posts
+      parameters:
+      - in: query
+        name: keyword
+        type: string
+      - in: query
+        name: more
+        type: boolean
+      - in: query
+        minimum: 0
+        name: page
+        type: integer
+      - in: query
+        minimum: 1
+        name: size
+        required: true
+        type: integer
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: statuses
+        type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.PageResponse'
+                  - properties:
+                      content:
+                        items:
+                          $ref: '#/definitions/response.PostResponse'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - admin: []
+      summary: Page for a list of posts
+      tags:
+      - post
+  /refresh_token:
+    post:
+      consumes:
+      - application/json
+      description: Refreshing an Administrator token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.RefreshTokenParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.TokenResponse'
+              type: object
+      summary: Refreshing an Administrator token
+      tags:
+      - public
+      - auth
+  /sheet:
+    post:
+      consumes:
+      - application/json
+      description: Create sheet
+      parameters:
+      - description: Sheet information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateOrUpdateSheetParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Create sheet
+      tags:
+      - sheet
+  /sheet/{id}:
+    delete:
+      description: Delete sheet by id
+      parameters:
+      - description: Sheet id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete sheet by id
+      tags:
+      - sheet
+    get:
+      description: Get sheet by id
+      parameters:
+      - description: Sheet id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.SheetResponse'
+              type: object
+      security:
+      - admin: []
+      summary: Get sheet by id
+      tags:
+      - sheet
+    put:
+      consumes:
+      - application/json
+      description: Update sheet by id
+      parameters:
+      - description: Sheet id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Sheet information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateOrUpdateSheetParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Update sheet by id
+      tags:
+      - sheet
+  /sheet/list:
+    get:
+      description: Page for a list of sheets
+      parameters:
+      - in: query
+        minimum: 0
+        name: page
+        type: integer
+      - in: query
+        minimum: 1
+        name: size
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.PageResponse'
+                  - properties:
+                      content:
+                        items:
+                          $ref: '#/definitions/table.Post'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - admin: []
+      summary: Page for a list of sheets
+      tags:
+      - sheet
+  /sheet/theme/all:
+    get:
+      description: Get theme all built-in sheets
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.ThemeSheetResponse'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get theme all built-in sheets
+      tags:
+      - sheet
+  /sheet/theme/setting/{sheet}:
+    get:
+      description: Get theme sheet configuration by sheet id
+      parameters:
+      - description: sheet name
+        in: path
+        name: sheet
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      security:
+      - admin: []
+      summary: Get theme sheet configuration by sheet id
+      tags:
+      - sheet
+    post:
+      consumes:
+      - application/json
+      description: Save theme sheet configuration
+      parameters:
+      - description: sheet name
+        in: path
+        name: sheet
+        required: true
+        type: string
+      - description: Theme configuration information
+        in: body
+        name: param
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Save theme sheet configuration
+      tags:
+      - sheet
+  /sheet/theme/setting/{sheet}/schema:
+    get:
+      description: Get theme sheet schema by sheet id
+      parameters:
+      - description: sheet name
+        in: path
+        name: sheet
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/yaml.ThemeSettingSchemaGroup'
+              type: object
+      security:
+      - admin: []
+      summary: Get theme sheet schema by sheet id
+      tags:
+      - sheet
+  /site:
+    get:
+      description: Get site by id
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Site'
+              type: object
+      security:
+      - admin: []
+      summary: Get site by id
+      tags:
+      - site
+  /site/{id}:
+    put:
+      consumes:
+      - application/json
+      description: UpdateById site by id
+      parameters:
+      - description: Site id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Site information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Site'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById site by id
+      tags:
+      - site
+  /statistic:
+    get:
+      description: Get statistics information
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.StatisticResponse'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get statistics information
+      tags:
+      - statistic
+  /statistic/admin:
+    get:
+      description: Get statistics and administrator information
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.StatisticWithAdminResponse'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get statistics and administrator information
+      tags:
+      - statistic
+  /system/environments:
+    get:
+      consumes:
+      - application/json
+      description: Gets environments info
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.EnvironmentResponse'
+              type: object
+      security:
+      - admin: []
+      summary: Gets environments info
+      tags:
+      - system
+  /tag:
+    post:
+      consumes:
+      - application/json
+      description: Create tag
+      parameters:
+      - description: Tag information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Tag'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Tag'
+              type: object
+      security:
+      - admin: []
+      summary: Create tag
+      tags:
+      - tag
+  /tag/{id}:
+    delete:
+      description: Delete tag by id
+      parameters:
+      - description: Tag id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete tag by id
+      tags:
+      - tag
+    get:
+      description: Get category by id
+      parameters:
+      - description: Tag id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/table.Tag'
+              type: object
+      security:
+      - admin: []
+      summary: Get tag by id
+      tags:
+      - tag
+    put:
+      consumes:
+      - application/json
+      description: UpdateById tag by id
+      parameters:
+      - description: Tag id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Tag information
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/table.Tag'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: UpdateById tag by id
+      tags:
+      - tag
+  /tag/all:
+    get:
+      consumes:
+      - application/json
+      description: Get all tags
+      parameters:
+      - description: Show number of posts
+        in: query
+        name: more
+        required: true
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.TagMoreResponse'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get all tags
+      tags:
+      - tag
+  /theme/{id}:
+    delete:
+      description: Delete theme by id
+      parameters:
+      - description: theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Deleting a theme configuration
+        in: query
+        name: deleteSettings
+        required: true
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Delete theme by id
+      tags:
+      - theme
+    get:
+      description: Get theme by id
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/yaml.ThemeRepository'
+              type: object
+      security:
+      - admin: []
+      summary: Get theme by id
+      tags:
+      - theme
+  /theme/{id}/activation:
+    post:
+      consumes:
+      - application/json
+      description: Activate theme
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/yaml.ThemeRepository'
+              type: object
+      security:
+      - admin: []
+      summary: Activate theme
+      tags:
+      - theme
+  /theme/activation:
+    get:
+      description: Get theme by activated
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/yaml.ThemeRepository'
+              type: object
+      security:
+      - admin: []
+      summary: Get theme by activated
+      tags:
+      - theme
+  /theme/all:
+    get:
+      consumes:
+      - application/json
+      description: Get all theme
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/yaml.ThemeRepository'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get all theme
+      tags:
+      - theme
+  /theme/file/{id}:
+    get:
+      description: Get theme template files by id
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.ThemeFileResponse'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get theme template files by id
+      tags:
+      - theme
+  /theme/file/{id}/content:
+    get:
+      description: Get theme template files content by path
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Theme template file path
+        in: query
+        name: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - admin: []
+      summary: Get theme template files content by path
+      tags:
+      - theme
+    put:
+      consumes:
+      - application/json
+      description: Update theme template files content by path
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Theme template file content
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateThemeFileContentRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Update theme template files content by path
+      tags:
+      - theme
+  /theme/setting/{id}:
+    get:
+      description: Get theme configuration by id
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  additionalProperties:
+                    additionalProperties: true
+                    type: object
+                  type: object
+              type: object
+      security:
+      - admin: []
+      summary: Get theme configuration by id
+      tags:
+      - theme
+    post:
+      consumes:
+      - application/json
+      description: Save theme configuration
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Theme configuration information
+        in: body
+        name: param
+        required: true
+        schema:
+          additionalProperties:
+            additionalProperties: true
+            type: object
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - admin: []
+      summary: Save theme configuration
+      tags:
+      - theme
+  /theme/setting/{id}/schema:
+    get:
+      description: Get theme schema by id
+      parameters:
+      - description: Theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/yaml.ThemeSettingSchemaGroup'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get theme schema by id
+      tags:
+      - theme
+  /theme/setting/activation:
+    get:
+      description: Get theme configuration by activated
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  additionalProperties:
+                    additionalProperties: true
+                    type: object
+                  type: object
+              type: object
+      security:
+      - admin: []
+      summary: Get theme configuration by activated
+      tags:
+      - theme
+  /theme/setting/activation/schema:
+    get:
+      description: Get theme schema by activated
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/yaml.ThemeSettingSchemaGroup'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get theme schema by activated
+      tags:
+      - theme
+  /theme/template/{type}:
+    get:
+      description: Get theme template schema by template type
+      parameters:
+      - description: template type
+        in: path
+        name: type
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/yaml.ThemeTemplateSchemaGroup'
+                  type: array
+              type: object
+      security:
+      - admin: []
+      summary: Get theme template schema by template type
+      tags:
+      - theme
+  /theme/upload:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Upload theme
+      parameters:
+      - description: File stream
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/yaml.ThemeRepository'
+              type: object
+      security:
+      - admin: []
+      summary: Upload theme
+      tags:
+      - theme
+  /theme/upload/{id}:
+    put:
+      consumes:
+      - application/json
+      description: UpdateById theme by id
+      parameters:
+      - description: theme id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: File stream
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/yaml.ThemeRepository'
+              type: object
+      security:
+      - admin: []
+      summary: UpdateById theme by id
+      tags:
+      - theme
+produces:
+- application/json
+schemes:
+- http
+- https
+securityDefinitions:
+  admin:
+    in: header
+    name: Admin-Authorization
+    type: apiKey
+swagger: "2.0"
