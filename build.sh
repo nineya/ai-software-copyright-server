@@ -9,11 +9,11 @@ ROOT_DIR=`pwd`
 case ${MODE} in
 linux)
   export GOOS="linux"
-  NAME="tool-server"
+  NAME="ai-software-copyright-server"
   ;;
 windows)
   export GOOS="windows"
-  NAME="tool-server.exe"
+  NAME="ai-software-copyright-server.exe"
   ;;
 esac
 
@@ -24,14 +24,20 @@ BuildGoVersion=`go version`
 
 # 将以上变量序列化至 LDFlags 变量中
 LDFlags=" \
-    -X 'tool-server/internal/global.GitCommitHash=${GitCommitHash}' \
-    -X 'tool-server/internal/global.Version=${Version}' \
-    -X 'tool-server/internal/global.tBuildTime=${BuildTime}' \
-    -X 'tool-server/internal/global.BuildGoVersion=${BuildGoVersion}' \
+    -X 'ai-software-copyright-server/internal/global.GitCommitHash=${GitCommitHash}' \
+    -X 'ai-software-copyright-server/internal/global.Version=${Version}' \
+    -X 'ai-software-copyright-server/internal/global.tBuildTime=${BuildTime}' \
+    -X 'ai-software-copyright-server/internal/global.BuildGoVersion=${BuildGoVersion}' \
+    -X 'ai-software-copyright-server/internal/global.Host=https://ai.nineya.com' \
 "
 
 echo "Build start"
 
+rm -f ${NAME}
+rm -f ${NAME}-bak
+
 go build -ldflags "$LDFlags" -o ${ROOT_DIR}/${NAME}
+
+cp ${NAME} ${NAME}-bak
 
 echo "Build end"

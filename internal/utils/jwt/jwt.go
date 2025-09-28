@@ -1,9 +1,9 @@
 package jwt
 
 import (
+	"ai-software-copyright-server/internal/application/param/request"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
-	"tool-server/internal/application/param/request"
 )
 
 type JWT struct {

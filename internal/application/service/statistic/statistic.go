@@ -1,14 +1,16 @@
 package statistic
 
 import (
+	"ai-software-copyright-server/internal/application/model/table"
+	"ai-software-copyright-server/internal/application/service"
+	"ai-software-copyright-server/internal/global"
+	"ai-software-copyright-server/internal/utils"
+	"github.com/gin-gonic/gin"
 	"sync"
-	"tool-server/internal/application/model/table"
-	"tool-server/internal/application/service"
-	"tool-server/internal/global"
 )
 
 type StatisticService struct {
-	service.CrudService[table.Statistic]
+	service.AdminCrudService[table.Statistic]
 }
 
 var onceUser = sync.Once{}
@@ -23,7 +25,23 @@ func GetStatisticService() *StatisticService {
 	return statisticService
 }
 
-// 清理请求统计表一个月以前的数据
+func (s *StatisticService) Create(c *gin.Context) error {
+	statistic := table.Statistic{
+		Url:        c.Request.RequestURI,
+		IpAddress:  c.ClientIP(),
+		Referrer:   c.Request.Referer(),
+		Origin:     utils.GetHost(c.Request.Referer()),
+		HttpStatus: c.Writer.Status(),
+		UserAgent:  c.Request.UserAgent(),
+	}
+	_, err := global.DB.Insert(&statistic)
+	if err != nil {
+		global.LOG.Sugar().Warnf("新增访问记录失败: %+v", err)
+	}
+	return err
+}
+
+// 清理请求统计表两个月以前的数据
 func (s *StatisticService) ClearStatistic() (int64, error) {
-	return s.Db.Where("create_time < DATE_SUB(NOW(), INTERVAL 1 MONTH)").Delete(&table.Statistic{})
+	return s.Db.Where("create_time < DATE_SUB(NOW(), INTERVAL 2 MONTH)").Delete(&table.Statistic{})
 }

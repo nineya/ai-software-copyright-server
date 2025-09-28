@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错误 - {{ .Data.Configure.Title }}{{ Switch (not .Data.Configure.Subtitle) "" (print "|" .Data.Configure.Subtitle) }}</title>
+    {{- if .Data.Configure.Favicon -}}
+    <link rel="shortcut icon" type="images/x-icon" href="{{ .Data.Configure.Favicon }}">
+    {{- end -}}
+    {{- if .Data.Configure.SeoKeywords -}}
+    <meta name="keywords" content="{{ .Data.Configure.SeoKeywords }}"/>
+    {{- end -}}
+    {{- if .Data.Configure.SeoDescription -}}
+    <meta name="description" content="{{ .Data.Configure.SeoDescription }}">
+    {{- end -}}
+    {{ if .Data.Configure.CustomHead }}{{ Html .Data.Configure.CustomHead }}{{ end }}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* 顶部导航 */
+        .navbar {
+            background-color: white;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+
+        .logo {
+            color: #1e88e5;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #333;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-left: 20px;
+        }
+
+        .nav-link {
+            color: #555;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #1e88e5;
+        }
+
+        .nav-link.active {
+            color: #1e88e5;
+        }
+
+        .nav-link.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #1e88e5;
+        }
+
+        /* 移动端菜单按钮 */
+        .menu-toggle {
+            display: none;
+            color: #333;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* 错误页面内容 */
+        .error-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 50px 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 80px;
+            color: #ff5252;
+            margin-bottom: 30px;
+        }
+
+        .error-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .error-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .error-btn {
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .error-btn:hover {
+            background-color: #1565c0;
+        }
+
+        .error-btn.secondary {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .error-btn.secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 90px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: #1e88e5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: #1565c0;
+        }
+
+        /* 微信公众号按钮 */
+        .wechat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: #07C160;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .wechat-btn:hover {
+            background-color: #059048;
+        }
+
+        /* 微信公众号二维码 */
+        .wechat-qrcode {
+            position: absolute;
+            bottom: 0;
+            right: 60px;
+            width: 150px;
+            height: 180px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.3s;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            visibility: hidden;
+            z-index: 1000;
+        }
+
+        .wechat-btn:hover .wechat-qrcode {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wechat-qrcode img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .wechat-qrcode p {
+            font-size: 12px;
+            color: #333;
+            text-align: center;
+            margin: 0;
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* 友情链接 */
+        .friend-links {
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .friend-links-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px 20px;
+        }
+
+        .friend-links a {
+            color: #555;
+            text-decoration: none;
+        }
+
+        .friend-links a:hover {
+            color: #1e88e5;
+            text-decoration: underline;
+        }
+
+        .beian {
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        .beian a {
+            color: #777;
+            text-decoration: none;
+        }
+
+        .beian a:hover {
+            color: #1e88e5;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            /* 移动端导航菜单样式 */
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 60px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 60px);
+                background-color: white;
+                flex-direction: column;
+                transition: all 0.3s;
+                padding: 20px 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-item {
+                margin: 0;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-link {
+                display: block;
+                padding: 15px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .nav-link.active:after {
+                display: none;
+            }
+
+            .nav-link.active {
+                background-color: #f5f5f5;
+            }
+
+            /* 移动端错误页面调整 */
+            .error-container {
+                padding: 30px 20px;
+            }
+
+            .error-icon {
+                font-size: 60px;
+                margin-bottom: 20px;
+            }
+
+            .error-title {
+                font-size: 24px;
+            }
+
+            .error-message {
+                font-size: 16px;
+            }
+
+            .error-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .error-btn {
+                width: 100%;
+            }
+
+            /* 移动端返回顶部按钮 */
+            .back-to-top {
+                width: 40px;
+                height: 40px;
+                bottom: 70px;
+                right: 20px;
+            }
+
+            /* 移动端微信公众号按钮 */
+            .wechat-btn {
+                width: 40px;
+                height: 40px;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            /* 移动端微信公众号二维码 */
+            .wechat-qrcode {
+                bottom: 0;
+                right: 50px;
+                width: 120px;
+                height: 150px;
+            }
+
+            .wechat-qrcode img {
+                width: 90px;
+                height: 90px;
+            }
+
+            /* 移动端友情链接调整 - 两列布局 */
+            .friend-links-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                justify-items: center;
+                gap: 10px;
+            }
+
+            .friend-links a {
+                width: 100%;
+                text-align: center;
+                padding: 5px 0;
+            }
+        }
+        {{ if .Data.Configure.InlineCss }}{{ Css .Data.Configure.InlineCss }}{{ end }}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">{{ .Data.Configure.Title }}</a>
+
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <ul class="nav-menu">
+                {{- range .Data.Configure.Menus -}}
+                <li class="nav-item"><a href="{{ .Url }}" target="_blank" class="nav-link">{{- .Name -}}</a></li>
+                {{- end -}}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 错误页面内容 -->
+        <div class="error-container">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h1 class="error-title">{{ .Data.Title }}</h1>
+            <p class="error-message">{{ .Data.Message }}</p>
+            <div class="error-actions">
+                <a href="/" class="error-btn">
+                    <i class="fas fa-home"></i> 返回首页
+                </a>
+                <a href="javascript:location.reload();" class="error-btn secondary">
+                    <i class="fas fa-sync-alt"></i> 重新加载
+                </a>
+                <a href="mailto:{{ .Data.Configure.ContactEmail }}" class="error-btn secondary">
+                    <i class="fas fa-envelope"></i> 联系管理员
+                </a>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer>
+            <!-- 友情链接 - 移动端两列布局 -->
+            <div class="friend-links">
+                <div class="friend-links-container">
+                    {{- range .Data.Configure.Friends -}}
+                    <a href="{{ .Url }}" target="_blank">{{- .Name -}}</a>
+                    {{- end -}}
+                </div>
+            </div>
+
+            <p>声明：本站内容由网络爬虫自动抓取，仅提供信息检索服务，不储存、复制、传播任何文件，不做任何盈利，仅作个人公益学习，请勿非法&商业传播，如有侵权，请联系站长反馈告知删除</p>
+            {{- if .Data.Configure.Beian -}}
+            <div class="beian">
+                <a href="https://beian.miit.gov.cn/" target="_blank">{{ .Data.Configure.Beian }}</a>
+            </div>
+            {{- end -}}
+            <p>©{{ TimeFormat .Now "2006" }} {{ .Data.Configure.Title }} 版权所有</p>
+        </footer>
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- 微信公众号按钮 -->
+    {{- if .Data.Configure.WechatQrcode -}}
+    <div class="wechat-btn" id="wechatBtn">
+        <i class="fab fa-weixin"></i>
+        <!-- 微信公众号二维码 -->
+        <div class="wechat-qrcode" id="wechatQrcode">
+            <img src="{{- .Data.Configure.WechatQrcode -}}" alt="微信公众号二维码">
+            <p>扫码关注公众号</p>
+        </div>
+    </div>
+    {{- end -}}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        // 返回顶部按钮功能
+        const backToTopBtn = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 移动端菜单切换
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        menuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+        });
+
+        // 移动端点击菜单项后关闭菜单
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if(window.innerWidth <= 768) {
+                    navMenu.classList.remove('active');
+                }
+            });
+        });
+    </script>
+    {{ if .Data.Configure.InlineHtmlBody }}{{ Html .Data.Configure.InlineHtmlBody }}{{ end }}
+</body>
+</html>

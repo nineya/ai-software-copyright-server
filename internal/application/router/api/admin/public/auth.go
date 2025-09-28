@@ -1,16 +1,16 @@
 package public
 
 import (
+	"ai-software-copyright-server/internal/application/param/request"
+	"ai-software-copyright-server/internal/application/param/response"
+	"ai-software-copyright-server/internal/application/router/api"
+	adminSev "ai-software-copyright-server/internal/application/service/admin"
+	"ai-software-copyright-server/internal/global"
+	"ai-software-copyright-server/internal/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
 	"go.uber.org/zap"
-	"tool-server/internal/application/param/request"
-	"tool-server/internal/application/param/response"
-	"tool-server/internal/application/router/api"
-	adminSev "tool-server/internal/application/service/admin"
-	"tool-server/internal/global"
-	"tool-server/internal/utils"
 )
 
 type AuthApiRouter struct {
@@ -45,11 +45,11 @@ func (m *AuthApiRouter) Login(c *gin.Context) {
 	//}
 	token, err := adminSev.GetAuthService().Login(param)
 	if err != nil {
-		m.Log(c, "FAILED_LOGIN", fmt.Sprintf("试图登录 %s 账号失败：%s", param.Username, err.Error()))
+		m.AdminLog(c, "FAILED_LOGIN", fmt.Sprintf("试图登录 %s 账号失败：%s", param.Username, err.Error()))
 		response.FailWithError(err, c)
 		return
 	}
-	m.Log(c, "ADMIN_LOGIN", fmt.Sprintf("账号 %s 登录成功", param.Username))
+	m.AdminLog(c, "ADMIN_LOGIN", fmt.Sprintf("账号 %s 登录成功", param.Username))
 	response.OkWithData(token, c)
 }
 
@@ -67,7 +67,7 @@ func (m *AuthApiRouter) RefreshToken(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	token, err := adminSev.GetAuthService().RefreshToken(param)
+	token, err := utils.RefreshToken(param)
 	if err != nil {
 		response.FailWithError(err, c)
 		return

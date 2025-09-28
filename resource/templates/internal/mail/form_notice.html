@@ -1,0 +1,56 @@
+<div class="email-page" style="background:#fff;">
+    <style>@media screen and (max-width: 400px) {
+            .email-content {
+                width: 96% !important;
+            }
+
+            .email-title {
+                padding: 12px 14px !important;
+                font-size: 15px !important;
+            }
+
+            .email-title .icon {
+                display: none;
+            }
+
+            .email-text {
+                padding: 20px 20px 0 !important;
+            }
+
+            .email-footer {
+                padding: 10px !important;
+            }
+        }</style>
+    <div class="email-content"
+         style="width:90%;max-width:660px;margin:20px auto 30px;line-height:1.5;text-align:left;overflow:hidden;border-radius:8px;box-shadow:0 2px 12px 0 rgba(0,0,0,0.1);">
+        <div style="overflow:hidden;">
+            <h1 class="email-title"
+                style="position:relative;margin:0;-webkit-box-sizing:border-box;box-sizing:border-box;padding:14px 52px 14px 20px;line-height:1.6;font-size:16px;font-weight:normal;color:#fff;background:webkit-linear-gradient(-45deg,rgba(255,68,229,0.7),rgba(80,191,255,0.86),rgba(80,182,255,0.86));background:linear-gradient(-45deg,rgba(255,68,229,0.7),rgba(80,191,255,0.86),rgba(80,182,255,0.86));background-size:400% 400%;background-position:50% 100%;">
+                您的收集表单有新的数据提交啦！
+                <img class="icon" style="position:absolute;right:16px;top:10px;width:32px;"
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAFdQTFRF////////////////////////////////////////////////////////////////////////////////////////////////////////////AAAA////LEkQMAAAABx0Uk5TX69vz4+wT3Cf0N+g7+C/UH+QIDAQ8GA/wECAAMYhZPgAAAHzSURBVFjD7ZfZuoIgEIDNcilckC1B3/85T6xSoiLdna+5qmB+ZoUpm76U7Af41wBUQnjplFwgLNE5QFk/5g951GUsgMCVtmFAEgPIm3lTmvwQgK9mbwsEdyJAa36+4n0A08e3YhU0JDSjYXuAm1Zn4YAzjbhtA2q1QZCtlBGhNtRbgEGuUr5XNpyqI8IAJtfuZL/w0F3uYiEAbiL0X25IQoMDgE7aj46LH0kvujVAOcBj2oe/OeEA0oEhrgFlsB+fAGkAJXEAQj0TLED2TxV7BwjPBAPAJwwwJuA3gHQLxF9DYAmYAVxjU7Ak4uoDiPTgzE0oM0k8gCSOdrGq69yGo4cdtFWH4OVmYz46izOXRFsEqtgb4sI9z/1SP3bX4BKZuY2mxSp98wjrmctYob/gD4UVQB+qHeLmHlMLVH/mmwB+BsC2AWztQhvnAveDSA+CuAeYqgFUNo1cFMKlURRDv5FGca4QdSGhLwC9i0wiACy9lwTg82c7nwR0XuukACr//k0AyAjOxZQM6Ju3B+Q0IPeKMwHAuzn4NkYCSv3++/prAHoG5TX0dWZ4ov20A2DzkYxoCgP6KP17HxyyhOn0A30K+MaYp2oDPtWMRceQFEIwvDOptsspOGnYxjRR3z3vWNvQntX3ZiQGRsB+f3l+gDT5A4U2phC6e4RTAAAAAElFTkSuQmCC"></img>
+            </h1>
+            <div class="email-text" style="padding:20px 28px 10px;background:#fff;">
+                <p style="margin:0 0 5px;padding:0;line-height:24px;font-size:14px;color:#6e6e6e;"><span
+                            style="font-weight:bold;color:#50bfff;">{{ .Data.Admin.Nickname }}</span> ，您好!</p>
+                <p style="margin:0;padding:0;line-height:24px;font-size:14px;color:#6e6e6e;">访客在表单<span style="color:#50bfff;">《{{ .Data.Schema.Title }}》</span>提交了新数据：
+                <div style="margin:12px 0;padding:14px 20px 18px 20px;word-break:break-all;color:#6e6e6e;font-size:14px;background: repeating-linear-gradient(135deg, #f3f9ff, #f3f9ff 18px, #fff 0, #fff 30px);border-radius: 8px;border: 1px solid #f3f9ff; box-shadow: 0 2px 15px rgba(73,146,161,0.15);">
+                <p>表单内容概要如下，请及时处理！</p>
+                <table>
+                    {{- range .Data.Data -}}
+                    <tr><td style="color:#6e6e6e;font-size:14px;font-weight: bold">{{ .Name }}：</td><td style="color:#6e6e6e;font-size:14px;">{{ .Value }}</td></tr>
+                    {{- end -}}
+                </table>
+                </div>
+                <p style="margin:0 0 16px;padding:0;line-height:24px;font-size:13px;color:#6e6e6e;">
+                    <a href="{{ .Site.SiteUrl }}/admin/#/user/form/data?formId={{ .Data.Schema.Id }}" target="_blank" style="color:#5caaef;text-decoration:none;">点击前往管理后台</a>
+                </p>
+            </div>
+            <div class="email-footer" style="padding:10px 20px;border-top:1px solid #eee;">
+                <p style="margin:0;padding:0;line-height:24px;font-size:13px;color:#999;">* 注意：此邮件由 <a
+                            href="{{ .Site.SiteUrl }}" target="_blank" style="color:#50bfff;text-decoration:none;">{{ .Site.SiteName }}</a>
+                    自动发出，请勿回复。</p>
+            </div>
+        </div>
+    </div>
+</div>

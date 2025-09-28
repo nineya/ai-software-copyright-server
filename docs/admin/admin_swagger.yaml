@@ -1017,9 +1017,9 @@ info:
   contact:
     email: 361654768@qq.com
     name: nineya
-    url: https://www.nineya.com
-  description: Aurora 建站
-  title: Aurora Admin-API 文档
+    url: https://tool.nineya.com
+  description: Tool 服务
+  title: Tool Admin-API 文档
   version: v0.0.1
 paths:
   /admin:

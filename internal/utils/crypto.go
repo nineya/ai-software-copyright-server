@@ -127,3 +127,12 @@ func AesDecrypt(data, key []byte) ([]byte, error) {
 	stream.XORKeyStream(decrypted, data)
 	return decrypted, nil
 }
+
+// 生成128位aes秘钥
+func GenerateAES128Key() string {
+	key := make([]byte, 16) // 128位密钥
+	if _, err := rand.Read(key); err != nil {
+		panic(err)
+	}
+	return fmt.Sprintf("%x", key)
+}

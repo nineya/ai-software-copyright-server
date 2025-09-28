@@ -1,11 +1,11 @@
 package initialize
 
 import (
+	"ai-software-copyright-server/internal/global"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
-	"tool-server/internal/global"
 )
 
 func RunServer(router *gin.Engine) {
@@ -16,12 +16,12 @@ func RunServer(router *gin.Engine) {
 func initServer(router *gin.Engine) *http.Server {
 	address := fmt.Sprintf(":%d", global.CONFIG.Server.Port)
 	global.LOG.Info("Listening and serving HTTP on " + address)
-	global.LOG.Info("The working path of tool-server is " + global.WORK_DIR)
+	global.LOG.Info("The working path of ai-software-copyright-server is " + global.WORK_DIR)
 	return &http.Server{
 		Addr:           address,
 		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
+		ReadTimeout:    120 * time.Second,
+		WriteTimeout:   120 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 }

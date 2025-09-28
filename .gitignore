@@ -1,5 +1,8 @@
 .git/
 .idea/
-dev/logs/
+logs/
 dev/
+data/
 /LICENSE
+ai-software-copyright-server
+ai-software-copyright-server-bak

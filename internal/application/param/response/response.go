@@ -1,10 +1,12 @@
 package response
 
 import (
+	"ai-software-copyright-server/internal/global"
+	"ai-software-copyright-server/internal/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"net/http"
-	"tool-server/internal/global"
 )
 
 type Response struct {
@@ -67,7 +69,7 @@ func ForbiddenWithError(err error, c *gin.Context) {
 
 func FailWithError(err error, c *gin.Context) {
 	global.LOG.Error(fmt.Sprintf("Service error stack: %+v", err))
-	Result(http.StatusInternalServerError, ERROR, nil, err.Error(), c)
+	Result(http.StatusInternalServerError, ERROR, nil, HandleError(err), c)
 }
 
 func FailWithMessageAndError(message string, err error, c *gin.Context) {
@@ -89,4 +91,23 @@ func FailWithMessage(message string, c *gin.Context) {
 
 func FailWithDetailed(data interface{}, message string, c *gin.Context) {
 	Result(http.StatusInternalServerError, ERROR, data, message, c)
+}
+
+func HandleError(err error) string {
+	if errs, ok := err.(validator.ValidationErrors); ok {
+		return utils.ListJoin(errs, ",", func(index int, item validator.FieldError) string {
+			switch item.Tag() {
+			case "required":
+				return item.Field() + "必填"
+			case "gte":
+				return item.Field() + "长度需大于等于" + item.Param()
+			case "lte":
+				return item.Field() + "长度需小于等于" + item.Param()
+			case "email":
+				return item.Field() + "必须是邮箱格式"
+			}
+			return err.Error()
+		})
+	}
+	return err.Error()
 }

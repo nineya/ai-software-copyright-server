@@ -1,9 +1,9 @@
 package task
 
 import (
+	statisSev "ai-software-copyright-server/internal/application/service/statistic"
+	"ai-software-copyright-server/internal/global"
 	"fmt"
-	statisSev "tool-server/internal/application/service/statistic"
-	"tool-server/internal/global"
 )
 
 func ClearTask() {

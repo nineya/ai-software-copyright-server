@@ -11,7 +11,7 @@ const docTemplatecontent = `{
     "swagger": "2.0",
     "info": {
         "description": "{{escape .Description}}",
-        "title": "{{.Title}}",
+        "title": "{{.Subject}}",
         "contact": {},
         "version": "{{.Version}}"
     },
@@ -33,8 +33,8 @@ var SwaggerInfocontent = &swag.Spec{
 	Host:             "localhost:8888",
 	BasePath:         "",
 	Schemes:          []string{"http", "https"},
-	Title:            "Aurora Content-API 文档",
-	Description:      "Aurora 建站",
+	Title:            "Tool Content-API 文档",
+	Description:      "Tool 服务",
 	InfoInstanceName: "content",
 	SwaggerTemplate:  docTemplatecontent,
 	LeftDelim:        "{{",

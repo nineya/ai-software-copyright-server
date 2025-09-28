@@ -1,10 +1,10 @@
 package admin
 
 import (
+	"ai-software-copyright-server/internal/application/param/response"
+	"ai-software-copyright-server/internal/application/router/api"
+	adminSev "ai-software-copyright-server/internal/application/service/admin"
 	"github.com/gin-gonic/gin"
-	"tool-server/internal/application/param/response"
-	"tool-server/internal/application/router/api"
-	adminSev "tool-server/internal/application/service/admin"
 )
 
 type AdminApiRouter struct {

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>二维码</title>
+    <meta name="keywords" content="玖涯,副业工具,公私域运营,运营助手,二维码活码"/>
+    <meta name="description" content="玖涯副业工具，公私域运营助手，二维码活码。">
+    <meta name="site" content="https://tool.nineya.com">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="renderer" content="webkit"/>
+    <meta name="force-rendering" content="webkit"/>
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="shortcut icon" type="images/x-icon" href="https://blog.nineya.com/upload/2023/04/favicon.ico">
+</head>
+<body>
+<style>
+    *, :after, :before {
+        box-sizing: border-box;
+    }
+    body {
+        color: rgba(0, 0, 0, .85);
+        font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0;
+        background-color: rgb(243, 246, 254);
+    }
+    a {
+        color: #222;
+        text-decoration: none;
+    }
+    .qrcode {
+        background-color: #fff;
+        border-radius: 24px;
+        box-shadow: 0 8px 50px 0 rgba(0, 65, 217, .08);
+        overflow: hidden;
+        width: 380px;
+        max-width: 100%;
+        margin-top: 40px;
+    }
+    #qrcode-img img, #qrcode-img canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    @media (max-width: 1000px) {
+        .demo {
+            display: none;
+        }
+    }
+</style>
+
+<div style="display: flex; justify-content: center;align-items: center;">
+    <div class="qrcode">
+        {{- if .Data.TargetUrl -}}
+        <img src="{{- .Data.TargetUrl -}}" style="width: 100%;">
+        {{- else -}}
+        <p style="margin: 60px 20px;font-size: 20px;font-weight: 600;text-align: center;color: #e71717;">二维码暂不可用！</p>
+        {{- end -}}
+    </div>
+</div>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5174961715749300"
+        crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-format="autorelaxed"
+     data-ad-client="ca-pub-5174961715749300"
+     data-ad-slot="3086023524"></ins>
+<script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+{{- if .Data.TargetUrl -}}
+<script type="text/javascript">
+    !function () {
+        window.location.href = 'weixin://dl/business/?appid=wxe58c9e5384ba0953&path=pages/public/qrcode&query=' + encodeURIComponent('t={{- .Data.Alias -}}&url='+encodeURIComponent('{{- .Data.TargetUrl -}}'));
+    }()
+</script>
+{{- end -}}
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?ba46ae291b89a46230cb5210b61e4f84";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+</body>
+</html>

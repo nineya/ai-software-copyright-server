@@ -11,10 +11,10 @@ const docTemplateadmin = `{
     "swagger": "2.0",
     "info": {
         "description": "{{escape .Description}}",
-        "title": "{{.Title}}",
+        "title": "{{.Subject}}",
         "contact": {
             "name": "nineya",
-            "url": "https://www.nineya.com",
+            "url": "https://tool.nineya.com",
             "email": "361654768@qq.com"
         },
         "version": "{{.Version}}"
@@ -5492,8 +5492,8 @@ var SwaggerInfoadmin = &swag.Spec{
 	Host:             "localhost:8888",
 	BasePath:         "/api/admin",
 	Schemes:          []string{"http", "https"},
-	Title:            "Aurora Admin-API 文档",
-	Description:      "Aurora 建站",
+	Title:            "Tool Admin-API 文档",
+	Description:      "Tool 服务",
 	InfoInstanceName: "admin",
 	SwaggerTemplate:  docTemplateadmin,
 	LeftDelim:        "{{",

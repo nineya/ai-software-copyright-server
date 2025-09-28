@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"ai-software-copyright-server/internal/application/param/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"tool-server/internal/application/param/response"
 )
 
 // 统一API异常处理

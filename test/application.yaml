@@ -1,0 +1,57 @@
+server:
+  port: 8889
+  # 运行模式，dev/prod
+  mode: dev
+  # 缓存模式，memory/redis
+  cache: memory
+datasource:
+  type: mysql
+  url: test:123456@tcp(test.nineya.com:3306)/test_tool?charset=utf8mb4&parseTime=True&loc=Local
+  max-idle-conns: 10
+  max-open-conns: 1000
+  use-cache: true
+  cache-size: 1000
+  show-sql: true
+redis:
+  db: 8889
+  host: 'test.nineya.com:6379'
+  password: '361654768'
+jwt:
+  signing-key: 'ai-software-copyright-server'
+  expires-time: 604800
+  buffer-time: 86400
+weixin:
+  merchant:
+    mchid: 1697924723
+    api-v3-key: eS6oL9pD1eC5vM6wN9sG2aU8gG9zQ9sK
+    serial-no: 6A38DD3B7C5405D3A3421BA2DCC713AC902273AB
+    private-key-path: apiclient_key.pem
+    notify-url: https://tool.nineya.com/api/user/public/wxNotify/pay
+  mini-program:
+    blogger-helper:
+      appid: wx4af5d518ac7bf610
+      secret: 5122bb6faf37b2c4c1eaaf80482c64fa
+    traffic-toolbox:
+      appid: wx058e0477e9177d83
+      secret: e290f0fba8a4725b4c58ccb242a09a35
+    operation-helper:
+      appid: wxe58c9e5384ba0953
+      secret: 26e9faa185f3dc2337948f0ff14afc7a
+    wechat-toolbox:
+      appid: wxffd5b43362a00597
+      secret: e0a74d407a6dc894e43ae21250e6fe39
+tool:
+  image:
+    allow-unknown-bucket: false
+    default-bucket: default
+    buckets:
+      - blog
+      - user
+      - wechat-toolbox
+    download-path: http://192.168.31.162:8889/image
+plugin:
+  zhipu-ai:
+    apikey: 9c15b8f0ab5739aaa02ea772a9a2a34f.BYBizlMFhcTWXYcv
+logger:
+  path: logs
+  log-in-console: true

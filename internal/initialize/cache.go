@@ -1,10 +1,10 @@
 package initialize
 
 import (
+	"ai-software-copyright-server/internal/global"
+	"ai-software-copyright-server/internal/global/cache"
 	"github.com/pkg/errors"
 	"time"
-	"tool-server/internal/global"
-	"tool-server/internal/global/cache"
 )
 
 func InitCache() {

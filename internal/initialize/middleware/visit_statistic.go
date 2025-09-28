@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"ai-software-copyright-server/internal/application/model/table"
+	"ai-software-copyright-server/internal/global"
+	"ai-software-copyright-server/internal/utils"
 	"github.com/gin-gonic/gin"
-	"tool-server/internal/application/model/table"
-	"tool-server/internal/global"
 )
 
 // 访问统计
@@ -13,6 +14,8 @@ func VisitStatisticHandler(c *gin.Context) {
 			statistic := table.Statistic{
 				Url:        c.Request.RequestURI,
 				IpAddress:  c.ClientIP(),
+				Referrer:   c.Request.Referer(),
+				Origin:     utils.GetHost(c.Request.Referer()),
 				HttpStatus: c.Writer.Status(),
 				UserAgent:  c.Request.UserAgent(),
 			}

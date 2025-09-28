@@ -1,10 +1,10 @@
 package initialize
 
 import (
+	"ai-software-copyright-server/internal/global"
 	"context"
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
-	"tool-server/internal/global"
 )
 
 func InitRedis() {

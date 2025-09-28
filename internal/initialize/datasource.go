@@ -1,12 +1,12 @@
 package initialize
 
 import (
+	"ai-software-copyright-server/internal/application/model/table"
+	"ai-software-copyright-server/internal/global"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
-	"tool-server/internal/application/model/table"
-	"tool-server/internal/global"
 	"xorm.io/xorm"
 	"xorm.io/xorm/caches"
 )
@@ -23,7 +23,7 @@ func InitDatabase() {
 	}
 	db.SetMaxIdleConns(datasource.MaxIdleConns)
 	db.SetMaxOpenConns(datasource.MaxOpenConns)
-	if datasource.UseCache {
+	if datasource.UseCache && global.CONFIG.Server.Mode != "dev" {
 		global.LOG.Info(fmt.Sprintf("Use the xorm cache. The cache size is %d", datasource.CacheSize))
 		db.SetDefaultCacher(caches.NewLRUCacher(caches.NewMemoryStore(), datasource.CacheSize))
 	}
@@ -36,12 +36,41 @@ func InitDatabase() {
 }
 
 func syncTable(db *xorm.Engine) {
-	err := db.Sync(
-		new(table.Admin),
-		new(table.Log),
-		new(table.RedbookCookie),
-		new(table.RedbookVisitsTask),
+	_, err := db.SyncWithOptions(xorm.SyncOptions{IgnoreDropIndices: true}, new(table.NetdiskResource))
+	if err != nil {
+		global.LOG.Error("Failed to synchronize the database table structure.", zap.Any("err", err))
+		return
+	}
+	err = db.Sync(
+		//new(table.Admin),
+		//new(table.Buy),
+		//new(table.Cdkey),
+		//new(table.CdkeyRecord),
+		//new(table.ClientInfo),
+		new(table.CreditsChange),
+		new(table.CreditsOrder),
+		new(table.CreditsPrice),
+		//new(table.InviteRecord),
+		//new(table.NetdiskHelperConfigure),
+		//new(table.NetdiskResourceSearch),
+		//new(table.NetdiskSearchAppConfigure),
+		//new(table.NetdiskSearchSiteConfigure),
+		//new(table.NetdiskSearchWxampConfigure),
+		//new(table.NetdiskShortLinkConfigure),
+		//new(table.AdminLog),
+		//new(table.Notice),
+		//new(table.Qrcode),
+		//new(table.RedbookCookie),
+		//new(table.RedbookProhibited),
+		//new(table.RedbookVisitsTask),
+		//new(table.ShortLink),
 		new(table.Statistic),
+		//new(table.StudyResource),
+		//new(table.TimeClock),
+		//new(table.TimeClockMember),
+		//new(table.TimeClockRecord),
+		new(table.User),
+		new(table.UserLog),
 	)
 	if err != nil {
 		global.LOG.Error("Failed to synchronize the database table structure.", zap.Any("err", err))

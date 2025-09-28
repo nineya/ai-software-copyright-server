@@ -1,22 +1,28 @@
 package admin
 
 import (
-	"tool-server/internal/application/router/api/admin/admin"
-	"tool-server/internal/application/router/api/admin/public"
-	"tool-server/internal/application/router/api/admin/redbook"
+	"ai-software-copyright-server/internal/application/router/api/admin/admin"
+	"ai-software-copyright-server/internal/application/router/api/admin/cdkey"
+	"ai-software-copyright-server/internal/application/router/api/admin/netdisk"
+	"ai-software-copyright-server/internal/application/router/api/admin/public"
+	"ai-software-copyright-server/internal/application/router/api/admin/redbook"
+	"ai-software-copyright-server/internal/application/router/api/admin/user"
 )
 
 type RouterGroup struct {
 	Admin   admin.RouterGroup
+	Cdkey   cdkey.RouterGroup
+	Netdisk netdisk.RouterGroup
 	Public  public.RouterGroup
 	Redbook redbook.RouterGroup
+	User    user.RouterGroup
 }
 
-// @title Aurora Admin-API 文档
+// @title Tool Admin-API 文档
 // @version v0.0.1
-// @description Aurora 建站
+// @description Tool 服务
 // @contact.name nineya
-// @contact.url https://www.nineya.com
+// @contact.url https://tool.nineya.com
 // @contact.email 361654768@qq.com
 // @schemes http https
 // @host localhost:8888

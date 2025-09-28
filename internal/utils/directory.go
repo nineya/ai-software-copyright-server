@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"ai-software-copyright-server/internal/global"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -26,4 +28,9 @@ func DirSize(path string) (int64, error) {
 		return err
 	})
 	return size, err
+}
+
+// 取得图片文件物理存储路径
+func GetImageStorePath() string {
+	return fmt.Sprintf("%s/data/image", global.WORK_DIR)
 }

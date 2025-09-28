@@ -1,8 +1,8 @@
 host: localhost:8888
 info:
   contact: {}
-  description: Aurora 建站
-  title: Aurora Content-API 文档
+  description: Tool 服务
+  title: Tool Content-API 文档
   version: v0.0.1
 paths: {}
 produces:

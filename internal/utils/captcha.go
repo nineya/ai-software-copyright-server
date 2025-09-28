@@ -1,9 +1,9 @@
 package utils
 
 import (
+	"ai-software-copyright-server/internal/global"
 	"go.uber.org/zap"
 	"time"
-	"tool-server/internal/global"
 )
 
 func NewCaptchaStore() *CaptchaStore {

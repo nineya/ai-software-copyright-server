@@ -1,13 +1,14 @@
 package initialize
 
 import (
+	"ai-software-copyright-server/internal/global"
+	"ai-software-copyright-server/internal/utils"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"strings"
 	"time"
-	"tool-server/internal/global"
-	"tool-server/internal/utils"
 )
 
 func InitLogger() {
@@ -45,7 +46,22 @@ func getEncoder() zapcore.Encoder {
 
 func getEncoderCore(fileName string) (core zapcore.Core) {
 	writer := getWriteSyncer(fileName) // 使用file-rotatelogs进行日志分割
-	return zapcore.NewCore(getEncoder(), writer, zapcore.DebugLevel)
+	return zapcore.NewCore(getEncoder(), writer, getLevel())
+}
+
+func getLevel() zapcore.LevelEnabler {
+	switch strings.ToUpper(global.CONFIG.Logger.Level) {
+	case "DEBUG":
+		return zapcore.DebugLevel
+	case "INFO":
+		return zapcore.InfoLevel
+	case "WARN":
+		return zapcore.WarnLevel
+	case "ERROR":
+		return zapcore.ErrorLevel
+	default:
+		return zapcore.InfoLevel
+	}
 }
 
 func getWriteSyncer(file string) zapcore.WriteSyncer {

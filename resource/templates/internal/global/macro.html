@@ -1,0 +1,34 @@
+{{ define "global/favicon" }}
+{{- if .Site.Favicon -}}
+<link rel="shortcut icon" type="images/x-icon" href="{{ .Site.Favicon }}">
+{{- end -}}
+{{ end }}
+
+{{ define "global/head" }}
+{{template "global/favicon" .}}
+<meta name="generator" content="Aurora {{ .Version }}"/>
+{{- if .Options.SiteCustomHead -}}
+{{ Html .Options.SiteCustomHead }}
+{{- end -}}
+{{ end }}
+
+{{ define "global/footer_info" }}
+{{- if .Options.SiteFooterInfo -}}
+{{ Html .Options.SiteFooterInfo }}
+{{- end -}}
+{{ end }}
+
+{{ define "global/statistics" }}
+{{- if .Options.SiteStatisticsCode -}}
+{{ Html .Options.SiteStatisticsCode }}
+{{- end -}}
+{{ end }}
+
+{{ define "global/footer" }}
+{{- if .Options.SiteFooterInfo -}}
+{{ Html .Options.SiteFooterInfo }}
+{{- end -}}
+{{- if .Options.SiteStatisticsCode -}}
+{{ Html .Options.SiteStatisticsCode }}
+{{- end -}}
+{{ end }}

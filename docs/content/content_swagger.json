@@ -8,8 +8,8 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "Aurora 建站",
-        "title": "Aurora Content-API 文档",
+        "description": "Tool 服务",
+        "title": "Tool Content-API 文档",
         "contact": {},
         "version": "v0.0.1"
     },

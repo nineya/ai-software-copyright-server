@@ -1,12 +1,12 @@
 package initialize
 
 import (
+	"ai-software-copyright-server/internal/global"
+	"ai-software-copyright-server/internal/utils/jwt"
 	"fmt"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"path/filepath"
-	"tool-server/internal/global"
-	"tool-server/internal/utils/jwt"
 )
 
 func readCommandLineArgs() string {

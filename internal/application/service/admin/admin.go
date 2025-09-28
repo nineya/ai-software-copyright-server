@@ -1,10 +1,10 @@
 package admin
 
 import (
+	"ai-software-copyright-server/internal/application/model/table"
+	"ai-software-copyright-server/internal/application/service"
+	"ai-software-copyright-server/internal/global"
 	"sync"
-	"tool-server/internal/application/model/table"
-	"tool-server/internal/application/service"
-	"tool-server/internal/global"
 )
 
 type AdminService struct {

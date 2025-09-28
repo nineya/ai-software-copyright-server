@@ -1,10 +1,10 @@
 package admin
 
 import (
+	"ai-software-copyright-server/internal/application/param/response"
+	"ai-software-copyright-server/internal/application/router/api"
+	"ai-software-copyright-server/internal/utils"
 	"github.com/gin-gonic/gin"
-	"tool-server/internal/application/param/response"
-	"tool-server/internal/application/router/api"
-	adminSev "tool-server/internal/application/service/admin"
 )
 
 type AuthApiRouter struct {
@@ -25,7 +25,7 @@ func (m *AuthApiRouter) InitAuthApiRouter(Router *gin.RouterGroup) {
 // @router /auth/logout [post]
 func (m *AuthApiRouter) Logout(c *gin.Context) {
 	claims := m.GetClaims(c)
-	adminSev.GetAuthService().Logout(claims)
-	m.Log(c, "ADMIN_LOGOUT", "注销登录成功")
+	utils.RemoveToken(claims)
+	m.AdminLog(c, "ADMIN_LOGOUT", "注销登录成功")
 	response.Ok(c)
 }

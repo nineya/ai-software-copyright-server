@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"ai-software-copyright-server/internal/application/param/response"
+	"ai-software-copyright-server/internal/global"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"tool-server/internal/application/param/response"
-	"tool-server/internal/global"
 )
 
 func AdminAuth(c *gin.Context) {
@@ -19,7 +19,7 @@ func AdminAuth(c *gin.Context) {
 		response.UnauthorizedWithMessage("登录状态已失效", c)
 		return
 	}
-	checkKey := fmt.Sprintf("%s_%d_%s", global.AuthToken, claims.UserId, claims.Id)
+	checkKey := fmt.Sprintf("%s_%s_%d_%s", global.AuthToken, claims.UserType, claims.UserId, claims.Id)
 	if _, exist := global.CACHE.GetCache(checkKey); !exist {
 		response.UnauthorizedWithMessage("登录状态已失效", c)
 		return

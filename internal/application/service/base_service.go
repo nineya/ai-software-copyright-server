@@ -1,10 +1,10 @@
 package service
 
 import (
+	"ai-software-copyright-server/internal/application/param/request"
+	"ai-software-copyright-server/internal/application/param/response"
+	"ai-software-copyright-server/internal/global"
 	"math"
-	"tool-server/internal/application/param/request"
-	"tool-server/internal/application/param/response"
-	"tool-server/internal/global"
 	"xorm.io/xorm"
 )
 
@@ -26,6 +26,7 @@ func (s *BaseService) DbTransaction(exec func(*xorm.Session) error) (err error) 
 
 	// 关闭事务
 	defer func() {
+		defer session.Close()
 		if err != nil {
 			global.LOG.Error("事务回滚：" + err.Error())
 			// 事务回滚
@@ -33,12 +34,11 @@ func (s *BaseService) DbTransaction(exec func(*xorm.Session) error) (err error) 
 		} else if err2 := recover(); err2 != nil {
 			// 事务回滚
 			session.Rollback()
-			panic(err2.(error))
+			panic(err2)
 		} else {
 			// 事务提交
 			session.Commit()
 		}
-		defer session.Close()
 	}()
 
 	// 事务相关操作
@@ -93,4 +93,29 @@ func (S *BaseService) AddWhereAndOmitAdmin(adminId int64, session *xorm.Session)
 
 func (s *BaseService) AddWhereAdminByTable(tableName string, adminId int64, session *xorm.Session) *xorm.Session {
 	return session.Table(tableName).Where(tableName+".admin_id = ?", adminId)
+}
+
+// 取得带 userId 的数据库连接
+func (s *BaseService) WhereUserSession(userId int64) *xorm.Session {
+	return s.Db.Where("user_id = ?", userId)
+}
+
+func (s *BaseService) WhereAndOmitUserSession(userId int64) *xorm.Session {
+	return s.Db.Where("user_id = ?", userId).Omit("user_id")
+}
+
+func (s *BaseService) WhereUserSessionByTable(tableName string, userId int64) *xorm.Session {
+	return s.Db.Table(tableName).Where(tableName+".user_id = ?", userId)
+}
+
+func (S *BaseService) AddWhereUser(userId int64, session *xorm.Session) *xorm.Session {
+	return session.Where("user_id = ?", userId)
+}
+
+func (S *BaseService) AddWhereAndOmitUser(userId int64, session *xorm.Session) *xorm.Session {
+	return session.Where("user_id = ?", userId).Omit("user_id")
+}
+
+func (s *BaseService) AddWhereUserByTable(tableName string, userId int64, session *xorm.Session) *xorm.Session {
+	return session.Table(tableName).Where(tableName+".user_id = ?", userId)
 }
