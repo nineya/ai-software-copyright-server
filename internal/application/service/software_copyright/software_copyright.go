@@ -478,7 +478,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		//bookDoc.AddFormattedParagraph("操作说明：", &document.TextFormat{Bold: true})
 		handleMarkdownToWord(item.Operation, converter, bookDoc)
 	}
-	bookDoc.UpdateTOC()
+	bookDoc.UpdateTOC(config)
 
 	// 保存文档
 	if err := bookDoc.Save(storePath + "/文档鉴别材料.docx"); err != nil {

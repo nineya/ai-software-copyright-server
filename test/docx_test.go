@@ -16,10 +16,38 @@ import (
 func TestContainer(t *testing.T) {
 	initialize.InitSystemConfig()
 	initialize.InitLogger()
-	t.Run("ImageFile", ImageFile)
+	t.Run("TitleFile", TitleFile)
+	//t.Run("ImageFile", ImageFile)
 	//t.Run("BookFile", BookFile)
 	//t.Run("CodeFile", CodeFile)
 	//t.Run("CodeTemplate", CodeTemplate)
+}
+
+func TitleFile(t *testing.T) {
+	// 创建新文档
+	bookDoc := document.New()
+	// 添加引言
+	bookDoc.AddHeadingParagraphWithBookmark("第一章 引言", 1, "第一章 引言")
+	bookDoc.AddHeadingParagraphWithBookmark("第一章 引言", 1, "第一章 引言")
+	config := &document.TOCConfig{
+		MaxLevel:     3,
+		ShowPageNum:  true,
+		RightAlign:   true,
+		UseHyperlink: true,
+		DotLeader:    true,
+	}
+	bookDoc.GenerateTOC(config)
+	// 添加引言
+	bookDoc.AddHeadingParagraphWithBookmark("第二章 引言", 1, "第二章 引言")
+	bookDoc.AddHeadingParagraph("第四章 主要功能与特点", 2)
+	bookDoc.AddHeadingParagraph("第四章 主要功能与特点", 2)
+	bookDoc.AddHeadingParagraph("第四章 主要功能与特点", 3)
+	bookDoc.UpdateTOC(config)
+
+	// 保存文档
+	if err := bookDoc.Save("example.docx"); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func ImageFile(t *testing.T) {
@@ -212,7 +240,7 @@ func BookFile(t *testing.T) {
 		bookDoc.Body.Elements = append(bookDoc.Body.Elements, element)
 	}
 	bookDoc.AddHeadingParagraph("第四章 主要功能与特点", 1)
-	bookDoc.UpdateTOC()
+	bookDoc.UpdateTOC(config)
 
 	// 保存文档
 	if err := bookDoc.Save("example.docx"); err != nil {
