@@ -21,6 +21,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -119,7 +120,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		User: fmt.Sprintf("用户%d", userId),
 	}
 
-	// 分析用户需求
+	// *分析用户需求
 	result, err := difyPlugin.GetDifyPlugin().SendChat(s.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("分析用户需求失败：%+v", err))
@@ -143,7 +144,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		return
 	}
 
-	// 生成源代码
+	// *生成源代码
 	param.Inputs["mode"] = "源代码"
 	codeStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 	if err != nil {
@@ -168,15 +169,153 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		codeDoc.AddFormattedParagraph(line, codeContentStyle)
 	}
 	// 保存文档
-	if err = codeDoc.Save(storePath + "/程序鉴别材料.docx"); err != nil {
+	err = codeDoc.Save(storePath + "/程序鉴别材料.docx")
+	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
+		return
 	}
 	// 更新进度
 	progressCurrent += 1 + len(requirements)
 	sc.Progress = 100 * progressCount / progressCurrent
 	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 
-	// 生成用户手册
+	// *生成申请文档
+	requestDoc := document.New()
+	requestDoc.GetStyleManager().AddStyle(&style.Style{
+		Type:    "paragraph",
+		StyleID: "Normal",
+		Default: true,
+		Name: &style.StyleName{
+			Val: "Normal",
+		},
+		ParagraphPr: &style.ParagraphProperties{
+			Spacing: &style.Spacing{Before: "120", After: "120", Line: "240"},
+		},
+		RunPr: &style.RunProperties{
+			FontSize: &style.FontSize{
+				Val: "24", // 五号字体（10.5磅，Word中以半磅为单位）
+			},
+			FontFamily: &style.FontFamily{ASCII: "宋体", EastAsia: "宋体", HAnsi: "宋体", CS: "宋体"},
+		},
+	})
+	requestDoc.GetStyleManager().AddStyle(&style.Style{
+		Type:    "paragraph",
+		StyleID: "Heading1",
+		Name:    &style.StyleName{Val: "heading 1"},
+		BasedOn: &style.BasedOn{Val: "Normal"},
+		Next:    &style.Next{Val: "Normal"},
+		ParagraphPr: &style.ParagraphProperties{
+			KeepNext:  &style.KeepNext{},
+			KeepLines: &style.KeepLines{},
+			Spacing: &style.Spacing{
+				Before: "340", // 17磅段前间距
+				After:  "330", // 16.5磅段段后间距
+			},
+			OutlineLevel: &style.OutlineLevel{Val: "0"},
+		},
+		RunPr: &style.RunProperties{
+			Bold: &style.Bold{},
+			FontSize: &style.FontSize{
+				Val: "32", // 16磅
+			},
+			FontFamily: &style.FontFamily{ASCII: "宋体"},
+			Color:      &style.Color{Val: "000000"},
+		},
+	})
+	// 添加标题
+	paragraph := requestDoc.AddFormattedParagraph("软件著作权登记表单", &document.TextFormat{Bold: true, FontSize: 16})
+	paragraph.SetSpacing(&document.SpacingConfig{BeforePara: 18, AfterPara: 24})
+	paragraph.SetAlignment(document.AlignCenter)
+	requestDoc.AddParagraph("软件著作权登记所需要的所有信息都在表单中，逐个复制即可。")
+	// 软件申请信息
+	requestDoc.AddHeadingParagraph("一、软件申请信息", 1)
+	requestData := [][]string{
+		{"字段", "填写内容", "说明"},
+		{"权利取得方式", "原始取得"},
+		{"软件全称", sc.Name, "应简短明确，结尾使用“软件”、“系统”、“平台”或“App”"},
+		{"软件简称", sc.ShortName},
+		{"版本号", sc.Version},
+		{"权利范围", "全部权利"},
+	}
+	addTableIntoDoc(requestData, requestDoc)
+	// 软件开发信息
+	requestDoc.AddHeadingParagraph("二、软件开发信息", 1)
+	devData := [][]string{
+		{"字段", "填写内容", "说明"},
+		{"软件分类", "应用软件", "非特殊软件选“应用软件”"},
+		{"软件说明", "原创"},
+		{"开发方式", "单独开发", "选“单独开发”就可以，其他选项需要增加相关的协议"},
+		{"开发完成日期", sc.CreateTime.Format("2006-01-02")},
+		{"发表状态", "未发表", "选“未发表”即可，选择已发表需要填写首次发表日期和地点"},
+		{"著作权人", "", "系统自动带出，不可修改"},
+	}
+	addTableIntoDoc(devData, requestDoc)
+	// 软件功能与特点
+	requestDoc.AddHeadingParagraph("三、软件功能与特点", 1)
+	funcData := [][]string{{"字段", "填写内容", "说明"}}
+	funcData = append(funcData, []string{"开发的硬件环境", "Intel(R) Core(TM) i5-9400或同等性能CPU, 16GB DDR4内存, 512GB SSD"})
+	funcData = append(funcData, []string{"运行的硬件环境", "客户端：2核CPU, 4GB内存, 64GB存储；服务端：4核CPU, 8GB内存, 250GB SSD"})
+	funcData = append(funcData, []string{"开发该软件的操作系统", "Windows 11", "可以酌情修改"})
+	switch sc.CodeLang { // 根据源代码生成开发环境
+	case "Java":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "JDK, IntelliJ IDEA, Git", "可以酌情修改"})
+	case "Python":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "Python, PyCharm, Git", "可以酌情修改"})
+	case "JavaScript":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "Node.js, Visual Studio Code, Git", "可以酌情修改"})
+	case "C++":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "Microsoft Visual Studio, GCC, CMake, Git", "可以酌情修改"})
+	case "C#":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "Microsoft Visual Studio, Git", "可以酌情修改"})
+	case "Golang":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "GoLand, Git", "可以酌情修改"})
+	case "PHP":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "PHPStorm, Git", "可以酌情修改"})
+	case "Objective-C":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "Xcode, Git", "可以酌情修改"})
+	case "Swift":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "Xcode; SwiftUI, Git", "可以酌情修改"})
+	case "Visual Basic":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "Microsoft Visual Studio, Git", "可以酌情修改"})
+	case "Ruby":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "RubyMine, Microsoft Visual Studio, Git", "可以酌情修改"})
+	case "Rust":
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "IntelliJ IDEA, Cargo, Git", "可以酌情修改"})
+	default:
+		funcData = append(funcData, []string{"软件开发环境/开发工具", "IntelliJ IDEA, Git", "可以酌情修改"})
+	}
+	switch sc.Category {
+	case "小程序":
+		funcData = append(funcData, []string{"运行平台/操作系统", "微信小程序", "可以酌情修改"})
+		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "微信小程序", "可以酌情修改"})
+	case "手机APP":
+		funcData = append(funcData, []string{"运行平台/操作系统", "Android 10或更高版本, iOS 14或更高版本", "可以酌情修改"})
+		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "Android 10或更高版本, iOS 14或更高版本", "可以酌情修改"})
+	case "WEB应用":
+		funcData = append(funcData, []string{"运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
+		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
+	case "桌面软件":
+		funcData = append(funcData, []string{"运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
+		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
+	}
+	funcData = append(funcData, []string{"软件运行支撑环境/支持软件", "客户端：SQLite3；服务端：Nginx, MySQL, Redis", "可以酌情修改"})
+	funcData = append(funcData, []string{"编程语言", sc.CodeLang})
+	funcData = append(funcData, []string{"源程序量", strconv.Itoa(len(codeLines))})
+	funcData = append(funcData, []string{"开发目的", "Git"})
+	funcData = append(funcData, []string{"面向领域/行业", "Git"})
+	funcData = append(funcData, []string{"软件的主要功能", "Git"})
+	funcData = append(funcData, []string{"软件的技术特点", "Git", "按实际情况，可酌情修改"})
+	funcData = append(funcData, []string{"程序鉴别材料", "一般交存", "选择一般交存，然后上传玖涯软著生成的pdf文件。也可以下载word文件，做微调后上传。"})
+	funcData = append(funcData, []string{"文档鉴别材料", "一般交存", "选择一般交存，然后上传玖涯软著生成的pdf文件。也可以下载word文件，做微调后上传。"})
+	addTableIntoDoc(funcData, requestDoc)
+	// 保存文档
+	err = codeDoc.Save(storePath + "/著作权登记表.docx")
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("生成著作权登记表失败：%+v", err))
+		return
+	}
+
+	// *生成用户手册
 	param.Inputs["mode"] = "用户手册"
 	// 创建新文档
 	bookDoc := document.New()
@@ -297,7 +436,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	coverStyle := &document.TextFormat{Bold: true, FontFamily: "宋体", FontSize: 26}
 	defaultSpacing := &document.SpacingConfig{LineSpacing: 1.5}
 	bookDoc.AddFormattedParagraph("\n", coverStyle)
-	paragraph := bookDoc.AddFormattedParagraph(sc.Name, coverStyle)
+	paragraph = bookDoc.AddFormattedParagraph(sc.Name, coverStyle)
 	paragraph.SetAlignment(document.AlignCenter)
 	paragraph.SetSpacing(defaultSpacing)
 	paragraph = bookDoc.AddFormattedParagraph(sc.Version, coverStyle)
@@ -400,7 +539,6 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		width = 1920
 		height = 1080
 	}
-
 	// 创建chrome上下文
 	chromeCtx, chromeCancel := chromedp.NewContext(context.Background())
 	defer chromeCancel()
@@ -479,10 +617,10 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		handleMarkdownToWord(item.Operation, converter, bookDoc)
 	}
 	bookDoc.UpdateTOC(config)
-
 	// 保存文档
-	if err := bookDoc.Save(storePath + "/文档鉴别材料.docx"); err != nil {
-		log.Fatal(err)
+	err = bookDoc.Save(storePath + "/文档鉴别材料.docx")
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("生成文档鉴别材料失败：%+v", err))
 	}
 }
 
@@ -508,6 +646,40 @@ func handleMarkdownToWord(bookStr string, converter *markdown.Converter, bookDoc
 			}
 		}
 		bookDoc.Body.Elements = append(bookDoc.Body.Elements, element)
+	}
+}
+
+func addTableIntoDoc(data [][]string, doc *document.Document) {
+	// 创建基础表格配置
+	config := &document.TableConfig{
+		Rows:      len(data),
+		Cols:      3,
+		Width:     8600, // 表格宽度（磅）
+		ColWidths: []int{2000, 3300, 3300},
+		Data:      data,
+	}
+	table := doc.AddTable(config)
+	// 设置表头样式
+	for j := 0; j < table.GetColumnCount(); j++ {
+		cell, err := table.GetCell(0, j)
+		if err == nil {
+			cell.Properties.Shd = &document.TableCellShading{Fill: "DDDDDD"}
+			cell.Properties.TcMar = &document.TableCellMarginsCell{
+				Top:    &document.TableCellSpaceCell{W: "80"},
+				Bottom: &document.TableCellSpaceCell{W: "80"},
+			}
+			for i, _ := range cell.Paragraphs {
+				par := &cell.Paragraphs[i]
+				par.SetAlignment(document.AlignCenter)
+				for ii, _ := range par.Runs {
+					run := &par.Runs[ii]
+					run.Properties = &document.RunProperties{
+						Bold:       &document.Bold{},
+						FontFamily: &document.FontFamily{ASCII: "黑体", EastAsia: "黑体", HAnsi: "黑体", CS: "黑体"},
+					}
+				}
+			}
+		}
 	}
 }
 
