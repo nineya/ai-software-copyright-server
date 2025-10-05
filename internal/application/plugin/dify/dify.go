@@ -135,6 +135,7 @@ func (p *DifyPlugin) sendSSERequest(url, apiKey string, param any, event func(by
 		global.LOG.Info("Dify SSE请求：", zap.String("url", url), zap.String("result", result))
 		err = event(result)
 		if err != nil {
+			global.LOG.Error("Dify SSE请求Event执行失败：", zap.String("url", url), zap.Any("result", result), zap.Error(err))
 			return err
 		}
 	}

@@ -48,7 +48,7 @@ func GetSoftwareCopyrightService() *SoftwareCopyrightService {
 }
 
 func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopyright) (*response.UserBuyResponse, error) {
-	expenseCredits := 50
+	expenseCredits := 100
 	// 预检余额
 	_, err := userSev.GetUserService().GetAndCheckBalance(userId, expenseCredits)
 	if err != nil {
