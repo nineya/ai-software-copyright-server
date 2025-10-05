@@ -108,7 +108,7 @@ func (s *CdkeyService) Use(userId int64, cdkey string) (response.CdkeyUseRespons
 				ChangeCredits: mod.CreditsNum,
 				Remark:        fmt.Sprintf("核销Cdkey（%s），添加%d积分", mod.Cdkey, mod.CreditsNum),
 			}
-			result.NyCredits = mod.CreditsNum
+			result.Credits = mod.CreditsNum
 			_, err = userSev.GetUserService().ChangeCreditsRunning(userId, session, myRewardCredits)
 			if err != nil {
 				return err

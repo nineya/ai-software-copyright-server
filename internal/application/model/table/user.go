@@ -4,7 +4,6 @@ import "time"
 
 type User struct {
 	Id         int64      `json:"id,omitempty" xorm:"<- PK AUTOINCR"` //主键
-	Avatar     string     `json:"avatar,omitempty" xorm:"VARCHAR(511) notnull comment('头像地址')" binding:"required,lte=511" label:"头像地址"`
 	Nickname   string     `json:"nickname,omitempty" xorm:"VARCHAR(127) notnull comment('昵称')" binding:"required,lte=127" label:"昵称"`
 	Phone      *string    `json:"phone,omitempty" xorm:"VARCHAR(15) unique(phone) comment('用户手机号')" label:"用户手机号"`
 	Email      *string    `json:"email,omitempty" xorm:"VARCHAR(127) unique(email) comment('邮箱')" label:"邮箱"`

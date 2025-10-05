@@ -1,6 +1,6 @@
 package response
 
 type CdkeyUseResponse struct {
-	NyCredits int    `json:"nyCredits"`
-	Remark    string `json:"remark,omitempty"`
+	Credits int    `json:"credits"`
+	Remark  string `json:"remark,omitempty"`
 }

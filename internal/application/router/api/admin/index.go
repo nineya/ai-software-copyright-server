@@ -3,7 +3,6 @@ package admin
 import (
 	"ai-software-copyright-server/internal/application/router/api/admin/admin"
 	"ai-software-copyright-server/internal/application/router/api/admin/cdkey"
-	"ai-software-copyright-server/internal/application/router/api/admin/netdisk"
 	"ai-software-copyright-server/internal/application/router/api/admin/public"
 	"ai-software-copyright-server/internal/application/router/api/admin/redbook"
 	"ai-software-copyright-server/internal/application/router/api/admin/user"
@@ -12,7 +11,6 @@ import (
 type RouterGroup struct {
 	Admin   admin.RouterGroup
 	Cdkey   cdkey.RouterGroup
-	Netdisk netdisk.RouterGroup
 	Public  public.RouterGroup
 	Redbook redbook.RouterGroup
 	User    user.RouterGroup

@@ -74,12 +74,12 @@ func (s *WriteService) Title(userId int64, message string) (*response.RedbookWri
 	result := &response.RedbookWriteTitleResponse{Titles: titles}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(5), expenseCredits, fmt.Sprintf("购买小红书爆款标题生成服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(5), expenseCredits, fmt.Sprintf("购买小红书爆款标题生成服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 	return result, nil
 }
 
@@ -121,12 +121,12 @@ func (s *WriteService) Note(userId int64, message string) (*response.RedbookWrit
 	result := &response.RedbookWriteMessageResponse{Content: zhipuResult.Choices[0].Message.Content}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(6), expenseCredits, fmt.Sprintf("购买小红书笔记帮写/优化服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(6), expenseCredits, fmt.Sprintf("购买小红书笔记帮写/优化服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 	return result, nil
 }
 
@@ -169,11 +169,11 @@ func (s *WriteService) Planting(userId int64, message string) (*response.Redbook
 	result := &response.RedbookWriteMessageResponse{Content: zhipuResult.Choices[0].Message.Content}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(7), expenseCredits, fmt.Sprintf("购买小红书种草笔记生成服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(7), expenseCredits, fmt.Sprintf("购买小红书种草笔记生成服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 	return result, nil
 }

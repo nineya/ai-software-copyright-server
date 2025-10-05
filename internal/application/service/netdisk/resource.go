@@ -6,8 +6,6 @@ import (
 	"ai-software-copyright-server/internal/application/model/table"
 	"ai-software-copyright-server/internal/application/param/request"
 	"ai-software-copyright-server/internal/application/param/response"
-	baiduPlugin "ai-software-copyright-server/internal/application/plugin/baidu"
-	quarkPlugin "ai-software-copyright-server/internal/application/plugin/quark"
 	"ai-software-copyright-server/internal/application/service"
 	userSev "ai-software-copyright-server/internal/application/service/user"
 	"ai-software-copyright-server/internal/global"
@@ -95,12 +93,12 @@ func (s *ResourceService) Create(userId int64, param table.NetdiskResource) (*re
 		}
 
 		// 扣款
-		user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(14), 1, "新增1条网盘资源，花费1币")
+		user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(14), 1, "新增1条网盘资源，花费1币")
 		if err != nil {
 			return err
 		}
 		result.BuyCredits = 1
-		result.BalanceCredits = user.NyCredits
+		result.BalanceCredits = user.Credits
 		result.BuyMessage = "新增资源成功，花费1积分"
 		return nil
 	})
@@ -133,7 +131,7 @@ func (s *ResourceService) Import(userId int64, file *multipart.FileHeader) (*res
 	if err != nil {
 		return nil, errors.Wrap(err, "获取资源信息失败")
 	}
-	maxInsertCount := user.NyCredits
+	maxInsertCount := user.Credits
 	if freeCredit > int(count) {
 		maxInsertCount += freeCredit - int(count)
 	}
@@ -233,13 +231,13 @@ func (s *ResourceService) Import(userId int64, file *multipart.FileHeader) (*res
 				return err
 			}
 			// 余额不够，裁剪数组扣除金额对应的资源数量
-			if user.NyCredits < expenseCredits {
+			if user.Credits < expenseCredits {
 				// 再减一次资源数量
-				cutCount += expenseCredits - user.NyCredits
+				cutCount += expenseCredits - user.Credits
 				// 新的新增资源数量
-				insertCount -= expenseCredits - user.NyCredits
+				insertCount -= expenseCredits - user.Credits
 				insertResources = insertResources[:insertCount]
-				expenseCredits = user.NyCredits
+				expenseCredits = user.Credits
 			}
 			if cutCount > 0 {
 				result.BuyMessage = fmt.Sprintf("新增%d条，更新%d条，花费%d币，有%d条因为积分不足未处理", insertCount, updateCount, expenseCredits, cutCount)
@@ -247,12 +245,12 @@ func (s *ResourceService) Import(userId int64, file *multipart.FileHeader) (*res
 				result.BuyMessage = fmt.Sprintf("新增%d条，更新%d条，花费%d币", insertCount, updateCount, expenseCredits)
 			}
 			// 扣款
-			user, err = userSev.GetUserService().PaymentNyCreditsRunning(userId, session, enum.BuyType(14), expenseCredits, fmt.Sprintf("新增%d条网盘资源，花费%d币", insertCount, expenseCredits))
+			user, err = userSev.GetUserService().PaymentCreditsRunning(userId, session, enum.BuyType(14), expenseCredits, fmt.Sprintf("新增%d条网盘资源，花费%d币", insertCount, expenseCredits))
 			if err != nil {
 				return err
 			}
 			result.BuyCredits = expenseCredits
-			result.BalanceCredits = user.NyCredits
+			result.BalanceCredits = user.Credits
 		}
 		batch = 0
 		batchSize = 2000
@@ -330,34 +328,6 @@ func (s *ResourceService) Save(userId int64, param request.NetdiskResourceSavePa
 				return nil, errors.New("该资源已失效！")
 			}
 			param.TargetUrl = result
-		} else { // 不存在客户端，转存到内部用户名下
-			param.UserId = global.CONFIG.Plugin.Quark.UserId
-			// 通过分享链接判断是否已经转存过了
-			mod := table.NetdiskResource{ShareTargetUrl: param.ShareTargetUrl}
-			exist, err := s.WhereUserSession(param.UserId).Get(&mod)
-			if err != nil {
-				return nil, err
-			}
-			if exist {
-				return &mod, err
-			}
-			// 资源不存在，通过客户端转存
-			switch param.Type {
-			case enum.NetdiskType(2): //夸克
-				shareUrl, err := quarkPlugin.GetQuarkPlugin().DumpAndShare(param.ShareTargetUrl, param.SharePwd, "")
-				if err != nil {
-					return nil, err
-				}
-				param.TargetUrl = shareUrl
-			case enum.NetdiskType(4): //百度
-				shareUrl, err := baiduPlugin.GetBaiduPlugin().DumpAndShare("", param.ShareTargetUrl, param.SharePwd)
-				if err != nil {
-					return nil, err
-				}
-				param.TargetUrl = shareUrl
-			default:
-				return nil, errors.New("不支持的网盘类型")
-			}
 		}
 		// 到这里已经成功转存了，如果资源来源为空，更新来源为搜索转存
 		if param.Origin == 0 {
@@ -388,7 +358,7 @@ func (s *ResourceService) Save(userId int64, param request.NetdiskResourceSavePa
 	// 大于10000要收费
 	if int(count) > freeCredit {
 		// 扣款
-		_, err = userSev.GetUserService().PaymentNyCredits(param.UserId, enum.BuyType(14), 1, "新增1条网盘资源，花费1币")
+		_, err = userSev.GetUserService().PaymentCredits(param.UserId, enum.BuyType(14), 1, "新增1条网盘资源，花费1币")
 		if err != nil {
 			return &param.NetdiskResource, nil
 		}
@@ -420,29 +390,6 @@ func (s *ResourceService) UpdateCheckResult(param table.NetdiskResource) error {
 		CheckTime: param.CheckTime,
 	})
 	return err
-}
-
-func (s *ResourceService) ChangeAccount(param request.NetdiskResourceChangeAccountParam) error {
-	list, err := s.GetQuarkResourceByUserName(param.UserId, param.UserName, param.Limit)
-	if err != nil {
-		return err
-	}
-	go func() {
-		for _, item := range list {
-			targetUrl, err := quarkPlugin.GetQuarkPlugin().DumpAndShare(item.TargetUrl, "", param.ToPdirFid)
-			if err != nil {
-				global.LOG.Error(fmt.Sprintf("转存失败：%+v", err))
-			}
-			item.TargetUrl = targetUrl
-			item.UserName = ""
-			_, err = s.Db.ID(item.Id).AllCols().Update(item)
-			if err != nil {
-				global.LOG.Error(fmt.Sprintf("更新资料信息失败：%+v", err))
-			}
-			time.Sleep(10 * time.Second)
-		}
-	}()
-	return nil
 }
 
 // 取得用户指定夸克资源的数量
@@ -561,112 +508,6 @@ func (s *ResourceService) GetDeleteSearchResource(userId int64, typ enum.Netdisk
 	}
 	_ = s.WhereUserSession(userId).And("type = ? and origin = ? and short_link = '' and create_time < NOW() - INTERVAL ? MINUTE", typ, enum.NetdiskOrigin(2), minute).Find(&list)
 	return list
-}
-
-// 检查夸克资源的有效性
-func (s *ResourceService) CheckQuarkResource() (int, error) {
-	list := s.GetCheckQuarkResource(10)
-	for _, item := range list {
-		time.Sleep(30 * time.Second)
-		result, err := quarkPlugin.GetQuarkPlugin().GetStokenApi(quarkPlugin.GetQuarkPlugin().GetPwdId(item.TargetUrl), "")
-		// 没有数据，直接跳过
-		if result == nil {
-			global.LOG.Warn(fmt.Sprintf("获取夸克网盘资源信息失败: %+v", err))
-			continue
-		}
-		if err != nil {
-			// 失败了，修改文件状态
-			switch result.Code {
-			case 41012, 41006:
-				item.Status = enum.NetdiskStatus(3)
-			case 41010:
-				item.Status = enum.NetdiskStatus(4)
-			case 41011, 41019:
-				item.Status = enum.NetdiskStatus(5)
-			}
-			global.LOG.Warn(fmt.Sprintf("获取夸克网盘分享资源失败: %+v", err))
-		}
-		if result.Data.Author.NickName != "" {
-			item.UserName = result.Data.Author.NickName
-		}
-		if item.Name == "" {
-			item.Name = result.Data.Title
-		}
-		curTime := time.Now()
-		item.CheckTime = &curTime
-		_, err = s.Db.ID(item.Id).NoAutoTime().Update(item)
-		if err != nil {
-			global.LOG.Warn(fmt.Sprintf("更新夸克网盘分享资源失败: %+v", err))
-		}
-	}
-	return len(list), nil
-}
-
-// 检查百度网盘资源的有效性
-func (s *ResourceService) CheckBaiduResource() (int, error) {
-	list := s.GetCheckBaiduResource(10)
-	for _, item := range list {
-		shareId, passcode := baiduPlugin.GetBaiduPlugin().GetShareTokenAndPasscode(item.TargetUrl)
-		// 百度网盘提取码不可能为空的
-		if shareId == "" || passcode == "" {
-			curTime := time.Now()
-			item.CheckTime = &curTime
-			_, err := s.Db.ID(item.Id).NoAutoTime().Update(item)
-			if err != nil {
-				global.LOG.Warn(fmt.Sprintf("更新百度网盘分享资源失败: %+v", err))
-			}
-			continue
-		}
-		time.Sleep(30 * time.Second)
-		cookie := global.CONFIG.Plugin.Baidu.Cookie
-		// 验证提取码
-		cookies, _, err := baiduPlugin.GetBaiduPlugin().VerifyPassCodeApi(cookie, shareId, passcode)
-		if err != nil {
-			global.LOG.Warn(fmt.Sprintf("验证百度网盘分享资源提取码失败: %+v", err))
-			// 将资源更新为失效
-			item.Status = enum.NetdiskStatus(5)
-			curTime := time.Now()
-			item.CheckTime = &curTime
-			_, err := s.Db.ID(item.Id).NoAutoTime().Update(item)
-			if err != nil {
-				global.LOG.Warn(fmt.Sprintf("更新百度网盘分享资源失败: %+v", err))
-			}
-			continue
-		}
-		// 组合提取码的cookie信息
-		cookie = baiduPlugin.GetBaiduPlugin().GetCookie(cookies) + cookie
-		// 获取资源信息
-		info, err := baiduPlugin.GetBaiduPlugin().GetShareInfoByHtmlApi(cookie, item.TargetUrl)
-		// 没有数据，直接跳过
-		if info == nil {
-			global.LOG.Warn(fmt.Sprintf("获取百度网盘资源信息失败: %+v", err))
-			continue
-		}
-		if err != nil {
-			switch info.Errno {
-			case 145, 105, -7: // 取消
-				item.Status = enum.NetdiskStatus(3)
-			case 115: // 违规
-				item.Status = enum.NetdiskStatus(4)
-			case 117: // 失效
-				item.Status = enum.NetdiskStatus(5)
-			}
-			global.LOG.Warn(fmt.Sprintf("获取百度网盘分享资源失败: %+v", err))
-		}
-		if info.LinkUserName != "" {
-			item.UserName = info.LinkUserName
-		}
-		if item.Name == "" && len(info.FileList) > 0 {
-			item.Name = info.FileList[0].ServerFilename
-		}
-		curTime := time.Now()
-		item.CheckTime = &curTime
-		_, err = s.Db.ID(item.Id).NoAutoTime().Update(item)
-		if err != nil {
-			global.LOG.Warn(fmt.Sprintf("更新百度网盘分享资源失败: %+v", err))
-		}
-	}
-	return len(list), nil
 }
 
 // 通过目标路径取得网盘资源

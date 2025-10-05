@@ -1,35 +1,27 @@
 package user
 
 import (
-	"ai-software-copyright-server/internal/application/router/api/user/ai"
 	"ai-software-copyright-server/internal/application/router/api/user/cdkey"
 	"ai-software-copyright-server/internal/application/router/api/user/credits"
-	"ai-software-copyright-server/internal/application/router/api/user/flash_picture"
-	"ai-software-copyright-server/internal/application/router/api/user/mp"
 	"ai-software-copyright-server/internal/application/router/api/user/netdisk"
 	"ai-software-copyright-server/internal/application/router/api/user/public"
 	"ai-software-copyright-server/internal/application/router/api/user/qrcode"
 	"ai-software-copyright-server/internal/application/router/api/user/redbook"
-	"ai-software-copyright-server/internal/application/router/api/user/short_link"
+	"ai-software-copyright-server/internal/application/router/api/user/software_copyright"
 	"ai-software-copyright-server/internal/application/router/api/user/study"
-	"ai-software-copyright-server/internal/application/router/api/user/time_clock"
 	"ai-software-copyright-server/internal/application/router/api/user/user"
 )
 
 type RouterGroup struct {
-	Ai           ai.RouterGroup
-	Cdkey        cdkey.RouterGroup
-	Credits      credits.RouterGroup
-	FlashPicture flash_picture.RouterGroup
-	Mp           mp.RouterGroup
-	Netdisk      netdisk.RouterGroup
-	Public       public.RouterGroup
-	Qrcode       qrcode.RouterGroup
-	Redbook      redbook.RouterGroup
-	ShortLink    short_link.RouterGroup
-	Study        study.RouterGroup
-	TimeClock    time_clock.RouterGroup
-	User         user.RouterGroup
+	Cdkey             cdkey.RouterGroup
+	Credits           credits.RouterGroup
+	Netdisk           netdisk.RouterGroup
+	Public            public.RouterGroup
+	Qrcode            qrcode.RouterGroup
+	Redbook           redbook.RouterGroup
+	SoftwareCopyright software_copyright.RouterGroup
+	Study             study.RouterGroup
+	User              user.RouterGroup
 }
 
 // @title Tool User-API 文档

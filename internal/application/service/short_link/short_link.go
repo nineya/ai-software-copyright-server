@@ -75,12 +75,12 @@ func (s *ShortLinkService) Redirect(userId int64, param request.ShortLinkRedirec
 	result := &response.ShortLinkRedirectResponse{Url: param.SourceUrl}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(10), expenseCredits, fmt.Sprintf("购买短链重定向服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(10), expenseCredits, fmt.Sprintf("购买短链重定向服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 
 	return result, nil
 }

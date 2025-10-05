@@ -51,6 +51,20 @@ func ImageCompress(file multipart.File) ([]byte, error) {
 	return buf.Bytes(), err
 }
 
+// 使用 image/png 解码（推荐）
+func ImagePngWithDecode(data []byte) (width, height int, err error) {
+	// 创建 bytes.Reader
+	reader := bytes.NewReader(data)
+
+	// 解码 PNG 配置信息（不解码像素数据，性能更好）
+	config, err := png.DecodeConfig(reader)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return config.Width, config.Height, nil
+}
+
 func CopyFile(file *multipart.FileHeader, dstDir, dstFile string) error {
 	err := os.MkdirAll(dstDir, os.ModePerm)
 	if err != nil {

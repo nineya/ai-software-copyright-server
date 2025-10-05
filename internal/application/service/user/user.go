@@ -47,7 +47,7 @@ func (s *UserService) SendMail(userId int64, title, content string) error {
 	})
 }
 
-func (s *UserService) UpdateUserInfo(userId int64, param request.UserUpdateInfoParam) (*response.UserRewardResponse, error) {
+func (s *UserService) UpdateUserInfo(userId int64, param request.UserInfoParam) (*response.UserRewardResponse, error) {
 	mod, err := s.GetById(userId)
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ func (s *UserService) UpdateUserInfo(userId int64, param request.UserUpdateInfoP
 }
 
 // 购物减少积分
-func (s *UserService) PaymentNyCredits(userId int64, typ enum.BuyType, expenseCredits int, remark string) (*table.User, error) {
+func (s *UserService) PaymentCredits(userId int64, typ enum.BuyType, expenseCredits int, remark string) (*table.User, error) {
 	mod := &table.User{}
 	err := s.DbTransaction(func(session *xorm.Session) error {
 		// 执行金额变动和记录
@@ -142,7 +142,7 @@ func (s *UserService) PaymentNyCredits(userId int64, typ enum.BuyType, expenseCr
 }
 
 // 添加积分
-func (s *UserService) AddNyCredits(param request.UserAddNyCreditsParam) ([]table.User, error) {
+func (s *UserService) AddCredits(param request.UserAddCreditsParam) ([]table.User, error) {
 	list := make([]table.User, len(param.InviteCodes))
 	creditsChange := table.CreditsChange{Type: param.Type, ChangeCredits: param.AddCredits, Remark: param.Remark}
 	err := s.DbTransaction(func(session *xorm.Session) error {
@@ -164,7 +164,7 @@ func (s *UserService) AddNyCredits(param request.UserAddNyCreditsParam) ([]table
 }
 
 // 修改积分
-func (s *UserService) ChangeNyCredits(userId int64, param table.CreditsChange) (*table.User, error) {
+func (s *UserService) ChangeCredits(userId int64, param table.CreditsChange) (*table.User, error) {
 	var mod *table.User
 	err := s.DbTransaction(func(session *xorm.Session) error {
 		user, err := s.ChangeCreditsRunning(userId, session, param)
@@ -175,7 +175,7 @@ func (s *UserService) ChangeNyCredits(userId int64, param table.CreditsChange) (
 }
 
 // 购物减少积分
-func (s *UserService) PaymentNyCreditsRunning(userId int64, session *xorm.Session, typ enum.BuyType, expenseCredits int, remark string) (*table.User, error) {
+func (s *UserService) PaymentCreditsRunning(userId int64, session *xorm.Session, typ enum.BuyType, expenseCredits int, remark string) (*table.User, error) {
 	// 执行金额变动和记录
 	mod, err := s.ChangeCreditsRunning(userId, session, table.CreditsChange{Type: enum.CreditsChangeType(1), ChangeCredits: expenseCredits * -1, Remark: remark})
 	if err != nil {

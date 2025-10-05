@@ -7,7 +7,6 @@ import (
 	"ai-software-copyright-server/internal/application/router/api/content"
 	"ai-software-copyright-server/internal/application/router/api/user"
 	"ai-software-copyright-server/internal/application/router/html"
-	"ai-software-copyright-server/internal/application/router/socket"
 	"ai-software-copyright-server/internal/global"
 	"ai-software-copyright-server/internal/initialize/middleware"
 	"ai-software-copyright-server/internal/utils"
@@ -36,7 +35,6 @@ func InitRouter() *gin.Engine {
 	initSwaggerRouter(router)
 	initWebRouter(router)
 	initApiRouter(router)
-	initWebSocketRouter(router)
 	initValidator()
 	global.LOG.Info("The route mapping initialization is complete.")
 	return router
@@ -52,11 +50,6 @@ func initSwaggerRouter(router *gin.Engine) {
 		swaggerFiles.NewHandler(), func(config *ginSwagger.Config) {
 			config.InstanceName = "content"
 		}))
-}
-
-func initWebSocketRouter(router *gin.Engine) {
-	global.SOCKET = socket.GetWebSocket()
-	router.GET("/ws", global.SOCKET.NewHandler)
 }
 
 func initWebRouter(router *gin.Engine) {
@@ -85,6 +78,7 @@ func initApiRouter(router *gin.Engine) {
 	{
 		adminRouterGroup.Public.InitAiApiRouter(adminPublicGroup)
 		adminRouterGroup.Public.InitAuthApiRouter(adminPublicGroup)
+		adminRouterGroup.Public.InitDifyApiRouter(adminPublicGroup)
 	}
 	privateGroup := adminGroup.Group("")
 	privateGroup.Use(middleware.AdminAuth)
@@ -92,7 +86,6 @@ func initApiRouter(router *gin.Engine) {
 		adminRouterGroup.Admin.InitAdminApiRouter(privateGroup)
 		adminRouterGroup.Admin.InitAuthApiRouter(privateGroup)
 		adminRouterGroup.Cdkey.InitCdkeyApiRouter(privateGroup)
-		adminRouterGroup.Netdisk.InitResourceApiRouter(privateGroup)
 		adminRouterGroup.Redbook.InitCookieApiRouter(privateGroup)
 		adminRouterGroup.Redbook.InitProhibitedApiRouter(privateGroup)
 		adminRouterGroup.Redbook.InitVisitsApiRouter(privateGroup)
@@ -111,38 +104,25 @@ func initApiRouter(router *gin.Engine) {
 	{
 		userRouterGroup.Public.InitAuthApiRouter(userPublicGroup)
 		userRouterGroup.Public.InitCreditsApiRouter(userPublicGroup)
-		userRouterGroup.Public.InitMpApiRouter(userPublicGroup)
-		userRouterGroup.Public.InitNetdiskApiRouter(userPublicGroup)
 		userRouterGroup.Public.InitNoticeApiRouter(userPublicGroup)
-		userRouterGroup.Public.InitQrcodeApiRouter(userPublicGroup)
 		userRouterGroup.Public.InitStudyApiRouter(userPublicGroup)
 		userRouterGroup.Public.InitWxNotifyApiRouter(userPublicGroup)
 	}
 	userPrivateGroup := userGroup.Group("")
 	userPrivateGroup.Use(middleware.UserAuth)
 	{
-		userRouterGroup.Ai.InitAiApiRouter(userPrivateGroup)
 		userRouterGroup.Cdkey.InitCdkeyApiRouter(userPrivateGroup)
 		userRouterGroup.Credits.InitCreditsOrderApiRouter(userPrivateGroup)
-		userRouterGroup.FlashPicture.InitFlashPictureApiRouter(userPrivateGroup)
-		userRouterGroup.Mp.InitImageTextApiRouter(userPrivateGroup)
 		userRouterGroup.Netdisk.InitHelperApiRouter(userPrivateGroup)
 		userRouterGroup.Netdisk.InitNetdiskApiRouter(userPrivateGroup)
 		userRouterGroup.Netdisk.InitResourceApiRouter(userPrivateGroup)
-		userRouterGroup.Netdisk.InitSearchAppApiRouter(userPrivateGroup)
-		userRouterGroup.Netdisk.InitSearchSiteApiRouter(userPrivateGroup)
-		userRouterGroup.Netdisk.InitSearchWxampApiRouter(userPrivateGroup)
-		userRouterGroup.Netdisk.InitShortLinkApiRouter(userPrivateGroup)
 		userRouterGroup.Qrcode.InitQrcodeApiRouter(userPrivateGroup)
 		userRouterGroup.Redbook.InitCookieApiRouter(userPrivateGroup)
 		userRouterGroup.Redbook.InitProhibitedApiRouter(userPrivateGroup)
 		userRouterGroup.Redbook.InitRedbookApiRouter(userPrivateGroup)
 		userRouterGroup.Redbook.InitWriteApiRouter(userPrivateGroup)
-		userRouterGroup.ShortLink.InitShortLinkApiRouter(userPrivateGroup)
+		userRouterGroup.SoftwareCopyright.InitSoftwareCopyrightApiRouter(userPrivateGroup)
 		userRouterGroup.Study.InitResourceApiRouter(userPrivateGroup)
-		userRouterGroup.TimeClock.InitTimeClockApiRouter(userPrivateGroup)
-		userRouterGroup.TimeClock.InitTimeClockMemberApiRouter(userPrivateGroup)
-		userRouterGroup.TimeClock.InitTimeClockRecordApiRouter(userPrivateGroup)
 		userRouterGroup.User.InitAuthApiRouter(userPrivateGroup)
 		userRouterGroup.User.InitUserApiRouter(userPrivateGroup)
 	}

@@ -1,7 +1,6 @@
 package public
 
 import (
-	"ai-software-copyright-server/internal/application/model/table"
 	"ai-software-copyright-server/internal/application/param/request"
 	"ai-software-copyright-server/internal/application/param/response"
 	"ai-software-copyright-server/internal/application/router/api"
@@ -41,10 +40,10 @@ func (m *AuthApiRouter) Login(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	if !store.Verify(param.CaptchaId, param.Captcha, true) {
-		response.FailWithMessage("验证码错误", c)
-		return
-	}
+	//if !store.Verify(param.CaptchaId, param.Captcha, true) {
+	//	response.FailWithMessage("验证码错误", c)
+	//	return
+	//}
 	token, err := userSev.GetAuthService().Login(param)
 	if err != nil {
 		m.UserLog(c, "FAILED_LOGIN", fmt.Sprintf("试图登录 %s 账号失败，原因：%s", param.Phone, err.Error()))
@@ -103,11 +102,11 @@ func (m *AuthApiRouter) Captcha(c *gin.Context) {
 // @description User register
 // @tags public,user
 // @accept json
-// @param param body table.User true "User information"
+// @param param body request.UserInfoParam true "User information"
 // @success 200 {object} response.Response{data=response.UserLoginResponse}
 // @router /public/register [post]
 func (m *AuthApiRouter) Register(c *gin.Context) {
-	var param table.User
+	var param request.UserInfoParam
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.FailWithError(err, c)

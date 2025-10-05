@@ -40,6 +40,6 @@ func (m *CdkeyApiRouter) Use(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	m.UserLog(c, "CDKEY_USE", fmt.Sprintf("使用Cdkey %s 成功，添加 %d 积分", param.Cdkey, mod.NyCredits))
+	m.UserLog(c, "CDKEY_USE", fmt.Sprintf("使用Cdkey %s 成功，添加 %d 积分", param.Cdkey, mod.Credits))
 	response.OkWithData(mod, c)
 }

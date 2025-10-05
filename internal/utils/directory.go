@@ -34,3 +34,8 @@ func DirSize(path string) (int64, error) {
 func GetImageStorePath() string {
 	return fmt.Sprintf("%s/data/image", global.WORK_DIR)
 }
+
+// 取得图片文件物理存储路径
+func GetSoftwareCopyrightPath(id int64) string {
+	return fmt.Sprintf("%s/data/software_copyright/%d", global.WORK_DIR, id)
+}

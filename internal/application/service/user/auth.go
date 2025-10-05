@@ -49,15 +49,15 @@ func (s *AuthService) Login(param request.UserLoginParam) (*common.Token, error)
 	return utils.AuthToken(user.Id, global.User)
 }
 
-func (s *AuthService) Register(param table.User) error {
-	exist, err := s.Db.Get(table.User{Phone: param.Phone})
+func (s *AuthService) Register(param request.UserInfoParam) error {
+	exist, err := s.Db.Get(&table.User{Phone: &param.Phone})
 	if err != nil {
 		return errors.Wrap(err, "查询手机号失败")
 	}
 	if exist {
 		return errors.New("该手机号已注册")
 	}
-	exist, err = s.Db.Get(table.User{Email: param.Email})
+	exist, err = s.Db.Get(&table.User{Email: &param.Email})
 	if err != nil {
 		return errors.Wrap(err, "查询邮箱失败")
 	}
@@ -66,7 +66,7 @@ func (s *AuthService) Register(param table.User) error {
 	}
 
 	// 新增用户
-	mod := &table.User{Nickname: param.Nickname, Phone: param.Phone, Email: param.Email, Inviter: param.Inviter}
+	mod := &table.User{Nickname: param.Nickname, Phone: &param.Phone, Email: &param.Email, Inviter: param.Inviter}
 	hashPwd, err := bcrypt.GenerateFromPassword(utils.Md5ByBytes(param.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return errors.Wrap(err, "密码不符合要求")

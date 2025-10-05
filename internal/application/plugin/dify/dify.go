@@ -1,0 +1,155 @@
+package dify
+
+import (
+	"ai-software-copyright-server/internal/global"
+	"bufio"
+	"bytes"
+	"encoding/json"
+	"go.uber.org/zap"
+	"io"
+	"net/http"
+	"strings"
+	"sync"
+)
+
+type DifyPlugin struct {
+	Client http.Client
+}
+
+var onceDify = sync.Once{}
+var difyPlugin *DifyPlugin
+
+// 获取单例
+func GetDifyPlugin() *DifyPlugin {
+	onceDify.Do(func() {
+		difyPlugin = new(DifyPlugin)
+		difyPlugin.Client = http.Client{}
+	})
+	return difyPlugin
+}
+
+func (p *DifyPlugin) SendChat(apiKey string, param DifyChatMessageParam) (*DifyChatMessageResponse, error) {
+	param.ResponseMode = "blocking"
+	content, err := p.sendRequest("/chat-messages", apiKey, param)
+	if err != nil {
+		return nil, err
+	}
+
+	var result DifyChatMessageResponse // 反序列化JSON到结构体
+	err = json.Unmarshal(content, &result)
+	return &result, err
+}
+
+func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (string, error) {
+	param.ResponseMode = "streaming"
+
+	resultText := ""
+	err := p.sendSSERequest("/chat-messages", apiKey, param, func(content string) error {
+		content = strings.TrimPrefix(content, "data:")
+
+		var result DifyChatMessageSSEResponse // 反序列化JSON到结构体
+		err := json.Unmarshal([]byte(content), &result)
+		if err != nil {
+			return err
+		}
+		if result.Event == "message" {
+			resultText += result.Answer
+		}
+		return nil
+	})
+	return resultText, err
+}
+
+func (p *DifyPlugin) sendRequest(url, apiKey string, param any) ([]byte, error) {
+	var body io.Reader
+	if param != nil {
+		bytesData, _ := json.Marshal(param)
+		body = bytes.NewBuffer(bytesData)
+	}
+	req, err := http.NewRequest("POST", global.CONFIG.Plugin.Dify.Host+url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// 设置头部
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	resp, err := p.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	result, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	global.LOG.Info("Dify请求：", zap.String("url", url), zap.Any("param", param), zap.String("result", string(result)))
+	return result, nil
+}
+
+func (p *DifyPlugin) sendSSERequest(url, apiKey string, param any, event func(bytes string) error) error {
+	var body io.Reader
+	if param != nil {
+		bytesData, _ := json.Marshal(param)
+		body = bytes.NewBuffer(bytesData)
+	}
+	req, err := http.NewRequest("POST", global.CONFIG.Plugin.Dify.Host+url, body)
+	if err != nil {
+		return err
+	}
+
+	// 设置头部
+	req.Header.Set("Accept", "text/event-stream")
+	req.Header.Set("Cache-Control", "no-cache")
+	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	resp, err := p.Client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	global.LOG.Info("Dify SSE请求：", zap.String("url", url), zap.Any("param", param))
+
+	// 读取 SSE 流
+	reader := bufio.NewReader(resp.Body)
+	for {
+		result, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+		if !strings.HasPrefix(result, "data:") {
+			continue
+		}
+		global.LOG.Info("Dify SSE请求：", zap.String("url", url), zap.String("result", result))
+		err = event(result)
+		if err != nil {
+			return err
+		}
+	}
+}
+
+func (p *DifyPlugin) handleRequest(method, url, apiKey string, param any) (*http.Response, error) {
+	var body io.Reader
+	if param != nil {
+		bytesData, _ := json.Marshal(param)
+		body = bytes.NewBuffer(bytesData)
+	}
+	req, err := http.NewRequest(method, global.CONFIG.Plugin.Dify.Host+url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// 设置头部
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	return p.Client.Do(req)
+}

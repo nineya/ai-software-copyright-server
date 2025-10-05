@@ -25,17 +25,17 @@ func (m *UserApiRouter) InitUserApiRouter(Router *gin.RouterGroup) {
 // @description Add credits
 // @tags public,user
 // @accept json
-// @param param body table.UserRewardNyCreditsParam true "Add credits information"
+// @param param body table.UserRewardCreditsParam true "Add credits information"
 // @success 200 {object} response.Response{data=[]table.User}
 // @router /user/addCredits [post]
 func (m *UserApiRouter) AddCredits(c *gin.Context) {
-	var param request.UserAddNyCreditsParam
+	var param request.UserAddCreditsParam
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.FailWithError(err, c)
 		return
 	}
-	mod, err := userSev.GetUserService().AddNyCredits(param)
+	mod, err := userSev.GetUserService().AddCredits(param)
 	if err != nil {
 		response.FailWithError(err, c)
 		return

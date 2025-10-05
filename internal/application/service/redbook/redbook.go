@@ -95,12 +95,12 @@ func (s *RedbookService) RemoveWatermark(userId int64, url string) (*response.Re
 	result := &response.RedbookRemoveWatermarkResponse{Urls: urls}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(4), expenseCredits, fmt.Sprintf("购买小红书去水印服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(4), expenseCredits, fmt.Sprintf("购买小红书去水印服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 	return result, nil
 }
 
@@ -169,12 +169,12 @@ func (s *RedbookService) Valuation(userId int64, param request.RedbookParam) (*r
 	result.Price = fmt.Sprintf("%.2f", price)
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(2), expenseCredits, fmt.Sprintf("购买小红书账号估值服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(2), expenseCredits, fmt.Sprintf("购买小红书账号估值服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 	return result, err
 }
 
@@ -562,12 +562,12 @@ func (s *RedbookService) Weight(userId int64, param request.RedbookParam) (*resp
 	}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(3), expenseCredits, fmt.Sprintf("购买小红书账号权重检测服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(3), expenseCredits, fmt.Sprintf("购买小红书账号权重检测服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 	return result, err
 }
 

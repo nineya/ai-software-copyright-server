@@ -51,12 +51,12 @@ func (s *QrcodeService) Build(userId int64, param request.QrcodeBuildParam) (*re
 	result := &response.QrcodeBuildResponse{Content: base64.StdEncoding.EncodeToString(code)}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(9), expenseCredits, fmt.Sprintf("购买二维码生成服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(9), expenseCredits, fmt.Sprintf("购买二维码生成服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 
 	return result, nil
 }
@@ -115,12 +115,12 @@ func (s *QrcodeService) AddImageById(userId, id int64, file *multipart.FileHeade
 	result := &response.QrcodeAddImageResponse{Qrcode: *mod}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(18), expenseCredits, fmt.Sprintf("购买活码添加图片服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(18), expenseCredits, fmt.Sprintf("购买活码添加图片服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 
 	return result, nil
 }

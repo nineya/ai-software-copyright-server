@@ -93,12 +93,12 @@ func (s *FlashPictureService) Visits(userId, id int64) (*response.FlashPictureVi
 			}
 
 			// 扣款
-			user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(12), expenseCredits, fmt.Sprintf("购买浏览闪照服务，花费%d币", expenseCredits))
+			user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(12), expenseCredits, fmt.Sprintf("购买浏览闪照服务，花费%d币", expenseCredits))
 			if err != nil {
 				return err
 			}
 			result.BuyCredits = expenseCredits
-			result.BalanceCredits = user.NyCredits
+			result.BalanceCredits = user.Credits
 			return nil
 		}
 		_, err = session.Insert(table.FlashPictureRecord{
@@ -111,7 +111,7 @@ func (s *FlashPictureService) Visits(userId, id int64) (*response.FlashPictureVi
 		}
 		// 查询余额
 		user, err := userSev.GetUserService().GetById(userId)
-		result.BalanceCredits = user.NyCredits
+		result.BalanceCredits = user.Credits
 		return err
 	})
 	return result, err
@@ -145,12 +145,12 @@ func (s *FlashPictureService) GetOrigin(userId, id int64) (*response.UserBuyCont
 	}
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(11), expenseCredits, fmt.Sprintf("购买闪照查看来源服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(11), expenseCredits, fmt.Sprintf("购买闪照查看来源服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 
 	return result, nil
 }

@@ -94,11 +94,16 @@ type PluginMail struct {
 	AdminMail string `mapstructure:"admin-mail" json:"adminMail" yaml:"admin-mail"`
 }
 
+type PluginDify struct {
+	Host string `mapstructure:"host" json:"host" yaml:"host"`
+}
+
 type Plugin struct {
 	ZhipuAi PluginZhipuAi `mapstructure:"zhipu-ai" json:"zhipuAi" yaml:"zhipu-ai"`
 	Quark   PluginQuark   `mapstructure:"quark" json:"quark" yaml:"quark"`
 	Baidu   PluginBaidu   `mapstructure:"baidu" json:"baidu" yaml:"baidu"`
 	Mail    PluginMail    `mapstructure:"mail" json:"mail" yaml:"mail"`
+	Dify    PluginDify    `mapstructure:"dify" json:"dify" yaml:"dify"`
 }
 
 type Logger struct {

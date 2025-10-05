@@ -22,7 +22,6 @@ func (m *UserApiRouter) InitUserApiRouter(Router *gin.RouterGroup) {
 	m.Router = router
 	router.POST("rewardAd", m.RewardAd)
 	router.POST("rewardGoods", m.RewardGoods)
-	router.PUT("accessKey", m.UpdateAccessKey)
 	router.PUT("updateInfo", m.UpdateUserInfo)
 	router.GET("getInviteInfo", m.GetInviteInfo)
 	router.GET("getInviteCode", m.GetInviteCode)
@@ -37,13 +36,13 @@ func (m *UserApiRouter) InitUserApiRouter(Router *gin.RouterGroup) {
 // @security user
 // @router /user/rewardAd [post]
 func (m *UserApiRouter) RewardAd(c *gin.Context) {
-	var param request.UserRewardNyCreditsParam
+	var param request.UserRewardCreditsParam
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.FailWithError(err, c)
 		return
 	}
-	mod, err := userSev.GetUserService().ChangeNyCredits(m.GetUserId(c), table.CreditsChange{Type: enum.CreditsChangeType(2), ChangeCredits: param.RewardCredits, Remark: param.Remark})
+	mod, err := userSev.GetUserService().ChangeCredits(m.GetUserId(c), table.CreditsChange{Type: enum.CreditsChangeType(2), ChangeCredits: param.RewardCredits, Remark: param.Remark})
 	if err != nil {
 		m.UserLog(c, "USER_REWARD_AD", fmt.Sprintf("用户观看激励广告失败，原因：%s", err.Error()))
 		response.FailWithError(err, c)
@@ -67,31 +66,13 @@ func (m *UserApiRouter) RewardGoods(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	mod, err := userSev.GetUserService().PaymentNyCredits(m.GetUserId(c), enum.BuyType(15), 0, fmt.Sprintf("购买激励物品《%s》", param.Name))
+	mod, err := userSev.GetUserService().PaymentCredits(m.GetUserId(c), enum.BuyType(15), 0, fmt.Sprintf("购买激励物品《%s》", param.Name))
 	if err != nil {
 		m.UserLog(c, "USER_REWARD_GOODS", fmt.Sprintf("用户观看激励广告失败，原因：%s", err.Error()))
 		response.FailWithError(err, c)
 		return
 	}
 	m.UserLog(c, "USER_REWARD_AD", fmt.Sprintf("用户 %s 观看激励广告，获赠物品《%s》", mod.Nickname, param.Name))
-	response.OkWithData(mod, c)
-}
-
-// @summary 更新AccessKey
-// @description 更新AccessKey
-// @tags user
-// @accept json
-// @success 200 {object} response.Response{data=string}
-// @security user
-// @router /user/accessKey [put]
-func (m *UserApiRouter) UpdateAccessKey(c *gin.Context) {
-	mod, err := userSev.GetUserService().UpdateAccessKey(m.GetUserId(c))
-	if err != nil {
-		m.UserLog(c, "USER_ACCESS_KEY_UPDATE", fmt.Sprintf("用户AccessKey更新失败，原因：%s", err.Error()))
-		response.FailWithError(err, c)
-		return
-	}
-	m.UserLog(c, "USER_ACCESS_KEY_UPDATE", "用户AccessKey更新")
 	response.OkWithData(mod, c)
 }
 
@@ -103,7 +84,7 @@ func (m *UserApiRouter) UpdateAccessKey(c *gin.Context) {
 // @security user
 // @router /user/updateInfo [put]
 func (m *UserApiRouter) UpdateUserInfo(c *gin.Context) {
-	var param request.UserUpdateInfoParam
+	var param request.UserInfoParam
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.FailWithError(err, c)

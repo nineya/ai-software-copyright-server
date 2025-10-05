@@ -55,9 +55,8 @@ func (b *BaseApi) LogByAdminId(c *gin.Context, adminId int64, typ string, conten
 func (b *BaseApi) LogByUserId(c *gin.Context, userId int64, typ string, content string) {
 	logType, _ := enum.UserLogTypeValue(typ)
 	_, _ = log.GetUserService().Create(userId, table.UserLog{
-		ClientType: b.GetClientType(c),
-		Content:    content,
-		IpAddress:  c.ClientIP(),
-		Type:       logType,
+		Content:   content,
+		IpAddress: c.ClientIP(),
+		Type:      logType,
 	})
 }

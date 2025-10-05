@@ -110,12 +110,12 @@ func (s *ProhibitedService) Detection(userId int64, param request.RedbookProhibi
 	result.Content = content
 
 	// 扣款
-	user, err := userSev.GetUserService().PaymentNyCredits(userId, enum.BuyType(1), expenseCredits, fmt.Sprintf("购买小红书敏感词检测服务，花费%d币", expenseCredits))
+	user, err := userSev.GetUserService().PaymentCredits(userId, enum.BuyType(1), expenseCredits, fmt.Sprintf("购买小红书敏感词检测服务，花费%d币", expenseCredits))
 	if err != nil {
 		return nil, err
 	}
 	result.BuyCredits = expenseCredits
-	result.BalanceCredits = user.NyCredits
+	result.BalanceCredits = user.Credits
 	return result, err
 }
 

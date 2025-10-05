@@ -51,7 +51,7 @@ func (s *CreditsOrderService) CreateOrder(userId int64, clientType enum.ClientTy
 	}
 	order := &table.CreditsOrder{
 		UserId:      userId,
-		TradeNo:     fmt.Sprintf("POINTS_%d_%d_%d", userId, creditsPrice.Credits, time.Now().UnixMilli()),
+		TradeNo:     fmt.Sprintf("CREDITS_%d_%d_%d", userId, creditsPrice.Credits, time.Now().UnixMilli()),
 		ClientType:  clientType,
 		WxOpenid:    clientInfo.WxOpenid,
 		Description: fmt.Sprintf("购买%d个积分", creditsPrice.Credits),
