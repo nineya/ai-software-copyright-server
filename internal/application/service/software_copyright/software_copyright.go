@@ -20,6 +20,7 @@ import (
 	"github.com/chromedp/chromedp"
 	"log"
 	"math"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -75,7 +76,11 @@ func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopy
 	if err != nil {
 		return nil, err
 	}
-	go s.GenerateFileTask(userId, param)
+	mod, err := s.GetById(userId, param.Id)
+	if err != nil {
+		return nil, err
+	}
+	go s.GenerateFileTask(userId, *mod)
 	return result, err
 }
 
@@ -83,12 +88,14 @@ func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopy
 func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.SoftwareCopyright) {
 	var err error
 	defer func() {
-		sc.Progress = 100
 		if err != nil {
 			sc.Status = enum.SoftwareCopyrightStatus(3)
+			global.LOG.Error(fmt.Sprintf("软著申请材料生成失败：%+v", err))
 		} else if err := recover(); err != nil {
 			sc.Status = enum.SoftwareCopyrightStatus(3)
+			global.LOG.Error(fmt.Sprintf("软著申请材料生成失败：%+v", err))
 		} else {
+			sc.Progress = 100
 			sc.Status = enum.SoftwareCopyrightStatus(2)
 		}
 		_, err := s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
@@ -135,49 +142,14 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	sc.ConversationId = result.ConversationId
 	param.ConversationId = result.ConversationId
 	// 软著进度
-	progressCount := 7 + (len(requirements) * 4)
+	progressCount := 8 + (len(requirements) * 4)
 	progressCurrent := 1 + len(requirements)
-	sc.Progress = 100 * progressCount / progressCurrent
+	sc.Progress = 100 * progressCurrent / progressCount
 	_, err = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("更新软著会话ID失败：%+v", err))
 		return
 	}
-
-	// *生成源代码
-	param.Inputs["mode"] = "源代码"
-	codeStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
-	if err != nil {
-		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
-		return
-	}
-	codeLines := strings.Split(codeStr, "\n")
-	// 创建新文档
-	codeDoc := document.New()
-	codeDoc.SetPageMargins(25, 25, 20, 25)
-	codeDoc.SetDocGrid(document.DocGridDefault, 5, 40)
-	// 添加页眉
-	codeDoc.AddHeader(document.HeaderFooterTypeDefault, sc.Name+" "+sc.Version)
-	// 添加带页码的页脚
-	codeDoc.AddFooterWithPageNumber(document.HeaderFooterTypeDefault, "", true)
-	// 添加正文段落
-	codeContentStyle := &document.TextFormat{FontFamily: "宋体", FontSize: 11}
-	for _, line := range codeLines {
-		if line == "" || strings.HasPrefix(line, "```") || strings.HasPrefix(line, "//") || strings.HasPrefix(line, "# ") {
-			continue
-		}
-		codeDoc.AddFormattedParagraph(line, codeContentStyle)
-	}
-	// 保存文档
-	err = codeDoc.Save(storePath + "/程序鉴别材料.docx")
-	if err != nil {
-		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
-		return
-	}
-	// 更新进度
-	progressCurrent += 1 + len(requirements)
-	sc.Progress = 100 * progressCount / progressCurrent
-	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 
 	// *生成申请文档
 	requestDoc := document.New()
@@ -300,20 +272,71 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	}
 	funcData = append(funcData, []string{"软件运行支撑环境/支持软件", "客户端：SQLite3；服务端：Nginx, MySQL, Redis", "可以酌情修改"})
 	funcData = append(funcData, []string{"编程语言", sc.CodeLang})
-	funcData = append(funcData, []string{"源程序量", strconv.Itoa(len(codeLines))})
-	funcData = append(funcData, []string{"开发目的", "Git"})
-	funcData = append(funcData, []string{"面向领域/行业", "Git"})
-	funcData = append(funcData, []string{"软件的主要功能", "Git"})
-	funcData = append(funcData, []string{"软件的技术特点", "Git", "按实际情况，可酌情修改"})
+	funcData = append(funcData, []string{"源程序量", strconv.Itoa(25000 + rand.Intn(10000))})
+	param.Inputs["mode"] = "软著登记"
+	requestStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("生成软著申请登记信息失败：%+v", err))
+		return
+	}
+	requestInfo := response.SCRequestInfoResponse{}
+	err = json.Unmarshal([]byte(requestStr), &requestInfo)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("软著申请登记信息解析失败：%+v", err))
+		return
+	}
+	funcData = append(funcData, []string{"开发目的", requestInfo.Purpose, "按实际情况，可酌情修改"})
+	funcData = append(funcData, []string{"面向领域/行业", requestInfo.Oriented, "按实际情况，可酌情修改"})
+	funcData = append(funcData, []string{"软件的主要功能", requestInfo.Function, "按实际情况，可酌情修改"})
+	funcData = append(funcData, []string{"软件的技术特点", requestInfo.Feature, "按实际情况，可酌情修改"})
 	funcData = append(funcData, []string{"程序鉴别材料", "一般交存", "选择一般交存，然后上传玖涯软著生成的pdf文件。也可以下载word文件，做微调后上传。"})
 	funcData = append(funcData, []string{"文档鉴别材料", "一般交存", "选择一般交存，然后上传玖涯软著生成的pdf文件。也可以下载word文件，做微调后上传。"})
 	addTableIntoDoc(funcData, requestDoc)
 	// 保存文档
-	err = codeDoc.Save(storePath + "/著作权登记表.docx")
+	err = requestDoc.Save(storePath + "/著作权登记表.docx")
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成著作权登记表失败：%+v", err))
 		return
 	}
+	// 更新进度
+	progressCurrent += 1
+	sc.Progress = 100 * progressCurrent / progressCount
+	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
+
+	// *生成源代码
+	param.Inputs["mode"] = "源代码"
+	codeStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
+		return
+	}
+	codeLines := strings.Split(codeStr, "\n")
+	// 创建新文档
+	codeDoc := document.New()
+	codeDoc.SetPageMargins(20, 25, 20, 25)
+	codeDoc.SetDocGrid(document.DocGridDefault, 5, 40)
+	// 添加页眉
+	codeDoc.AddHeader(document.HeaderFooterTypeDefault, sc.Name+" "+sc.Version)
+	// 添加带页码的页脚
+	codeDoc.AddFooterWithPageNumber(document.HeaderFooterTypeDefault, "", true)
+	// 添加正文段落
+	codeContentStyle := &document.TextFormat{FontFamily: "宋体", FontSize: 11}
+	for _, line := range codeLines {
+		if line == "" || strings.HasPrefix(line, "```") || strings.HasPrefix(line, "//") || strings.HasPrefix(line, "# ") {
+			continue
+		}
+		codeDoc.AddFormattedParagraph(line, codeContentStyle)
+	}
+	// 保存文档
+	err = codeDoc.Save(storePath + "/程序鉴别材料.docx")
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
+		return
+	}
+	// 更新进度
+	progressCurrent += 1 + len(requirements)
+	sc.Progress = 100 * progressCurrent / progressCount
+	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 
 	// *生成用户手册
 	param.Inputs["mode"] = "用户手册"
@@ -472,7 +495,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	converter := markdown.NewConverter(markdown.DefaultOptions())
 	// 更新进度
 	progressCurrent += 1
-	sc.Progress = 100 * progressCount / progressCurrent
+	sc.Progress = 100 * progressCurrent / progressCount
 	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 	// 添加引言
 	bookDoc.AddHeadingParagraph("第一章 引言", 1)
@@ -498,7 +521,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	handleMarkdownToWord(bookStr, converter, bookDoc)
 	// 更新进度
 	progressCurrent += 1
-	sc.Progress = 100 * progressCount / progressCurrent
+	sc.Progress = 100 * progressCurrent / progressCount
 	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 	bookDoc.AddHeadingParagraph("第二章 软件概述", 1)
 	param.Query = `请结合软件的功能和信息，帮我完成软件概述章节的编写。容要丰富、有深度，可以分多段回答。
@@ -511,7 +534,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	handleMarkdownToWord(bookStr, converter, bookDoc)
 	// 更新进度
 	progressCurrent += 1
-	sc.Progress = 100 * progressCount / progressCurrent
+	sc.Progress = 100 * progressCurrent / progressCount
 	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 	bookDoc.AddHeadingParagraph("第三章 软件运行的软硬件环境", 1)
 	param.Query = `请结合软件的功能和信息，帮我完成第三章软件运行的软硬件环境的编写，要求包含运行硬件环境、软件环境等内容，请从各个角度给出软硬件具体的版本、参数要求。
@@ -529,7 +552,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	handleMarkdownToWord(bookStr, converter, bookDoc)
 	// 更新进度
 	progressCurrent += 1
-	sc.Progress = 100 * progressCount / progressCurrent
+	sc.Progress = 100 * progressCurrent / progressCount
 	_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 	bookDoc.AddHeadingParagraph("第四章 主要功能与特点", 1)
 	htmlContent := ""
@@ -590,7 +613,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		}
 		// 更新进度
 		progressCurrent += 1
-		sc.Progress = 100 * progressCount / progressCurrent
+		sc.Progress = 100 * progressCurrent / progressCount
 		_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 		bookDoc.AddHeadingParagraph(fmt.Sprintf("4.%d.1 功能介绍", i+1), 3)
 		handleMarkdownToWord(item.Desc, converter, bookDoc)
@@ -611,7 +634,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		}
 		// 更新进度
 		progressCurrent += 1
-		sc.Progress = 100 * progressCount / progressCurrent
+		sc.Progress = 100 * progressCurrent / progressCount
 		_, _ = s.WhereUserSession(userId).ID(sc.Id).Update(&sc)
 		//bookDoc.AddFormattedParagraph("操作说明：", &document.TextFormat{Bold: true})
 		handleMarkdownToWord(item.Operation, converter, bookDoc)
@@ -692,9 +715,9 @@ func addImageIntoWord(imageBytes []byte, bookDoc *document.Document) {
 	// 假设 imageData 是图片的字节数据
 	_, err = bookDoc.AddImageFromData(
 		imageBytes,
-		"image.png",             // 文件名
-		document.ImageFormatPNG, // 图片格式
-		width, height,           // 原始宽度和高度（像素）
+		fmt.Sprintf("image-%d.png", time.Now().UnixMilli()), // 文件名
+		document.ImageFormatPNG,                             // 图片格式
+		width, height,                                       // 原始宽度和高度（像素）
 		&document.ImageConfig{
 			Size: &document.ImageSize{
 				Width:           130.0 * math.Min(float64(width)/float64(height), 1), // 显示宽度（毫米）
