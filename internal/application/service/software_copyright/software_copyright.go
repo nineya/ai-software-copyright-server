@@ -21,6 +21,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"strings"
 	"sync"
 	"time"
 	"xorm.io/xorm"
@@ -142,34 +143,34 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		return
 	}
 
-	//// 生成源代码
-	//param.Inputs["mode"] = "源代码"
-	//codeStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
-	//if err != nil {
-	//	global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
-	//	return
-	//}
-	//codeLines := strings.Split(codeStr, "\n")
-	//// 创建新文档
-	//codeDoc := document.New()
-	//codeDoc.SetPageMargins(25, 25, 20, 25)
-	//codeDoc.SetDocGrid(document.DocGridDefault, 5, 40)
-	//// 添加页眉
-	//codeDoc.AddHeader(document.HeaderFooterTypeDefault, sc.Name+" "+sc.Version)
-	//// 添加带页码的页脚
-	//codeDoc.AddFooterWithPageNumber(document.HeaderFooterTypeDefault, "", true)
-	//// 添加正文段落
-	//codeContentStyle := &document.TextFormat{FontFamily: "宋体", FontSize: 11}
-	//for _, line := range codeLines {
-	//	if line == "" || strings.HasPrefix(line, "```") || strings.HasPrefix(line, "//") || strings.HasPrefix(line, "# ") {
-	//		continue
-	//	}
-	//	codeDoc.AddFormattedParagraph(line, codeContentStyle)
-	//}
-	//// 保存文档
-	//if err = codeDoc.Save(storePath + "/程序鉴别材料.docx"); err != nil {
-	//	global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
-	//}
+	// 生成源代码
+	param.Inputs["mode"] = "源代码"
+	codeStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
+		return
+	}
+	codeLines := strings.Split(codeStr, "\n")
+	// 创建新文档
+	codeDoc := document.New()
+	codeDoc.SetPageMargins(25, 25, 20, 25)
+	codeDoc.SetDocGrid(document.DocGridDefault, 5, 40)
+	// 添加页眉
+	codeDoc.AddHeader(document.HeaderFooterTypeDefault, sc.Name+" "+sc.Version)
+	// 添加带页码的页脚
+	codeDoc.AddFooterWithPageNumber(document.HeaderFooterTypeDefault, "", true)
+	// 添加正文段落
+	codeContentStyle := &document.TextFormat{FontFamily: "宋体", FontSize: 11}
+	for _, line := range codeLines {
+		if line == "" || strings.HasPrefix(line, "```") || strings.HasPrefix(line, "//") || strings.HasPrefix(line, "# ") {
+			continue
+		}
+		codeDoc.AddFormattedParagraph(line, codeContentStyle)
+	}
+	// 保存文档
+	if err = codeDoc.Save(storePath + "/程序鉴别材料.docx"); err != nil {
+		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
+	}
 	// 更新进度
 	progressCurrent += 1 + len(requirements)
 	sc.Progress = 100 * progressCount / progressCurrent
