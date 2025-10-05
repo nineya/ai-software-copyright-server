@@ -39,7 +39,7 @@ func (m *CreditsOrderApiRouter) Create(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	m.UserLog(c, "CREDITS_ORDER_CREATE", fmt.Sprintf("创建付款订单：%s，金额：%s, 积分数量：%d", mod.TradeNo, mod.OrderAmount, mod.CreditsNum))
+	m.UserLog(c, "CREDITS_ORDER_CREATE", fmt.Sprintf("创建付款订单：%s，金额：%s, 积分数量：%d", mod.TradeNo, mod.OrderAmount, mod.Credits))
 	response.OkWithData(mod, c)
 }
 

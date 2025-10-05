@@ -86,9 +86,6 @@ func initApiRouter(router *gin.Engine) {
 		adminRouterGroup.Admin.InitAdminApiRouter(privateGroup)
 		adminRouterGroup.Admin.InitAuthApiRouter(privateGroup)
 		adminRouterGroup.Cdkey.InitCdkeyApiRouter(privateGroup)
-		adminRouterGroup.Redbook.InitCookieApiRouter(privateGroup)
-		adminRouterGroup.Redbook.InitProhibitedApiRouter(privateGroup)
-		adminRouterGroup.Redbook.InitVisitsApiRouter(privateGroup)
 		adminRouterGroup.User.InitUserApiRouter(privateGroup)
 	}
 
@@ -113,14 +110,7 @@ func initApiRouter(router *gin.Engine) {
 	{
 		userRouterGroup.Cdkey.InitCdkeyApiRouter(userPrivateGroup)
 		userRouterGroup.Credits.InitCreditsOrderApiRouter(userPrivateGroup)
-		userRouterGroup.Netdisk.InitHelperApiRouter(userPrivateGroup)
-		userRouterGroup.Netdisk.InitNetdiskApiRouter(userPrivateGroup)
-		userRouterGroup.Netdisk.InitResourceApiRouter(userPrivateGroup)
-		userRouterGroup.Qrcode.InitQrcodeApiRouter(userPrivateGroup)
-		userRouterGroup.Redbook.InitCookieApiRouter(userPrivateGroup)
-		userRouterGroup.Redbook.InitProhibitedApiRouter(userPrivateGroup)
-		userRouterGroup.Redbook.InitRedbookApiRouter(userPrivateGroup)
-		userRouterGroup.Redbook.InitWriteApiRouter(userPrivateGroup)
+
 		userRouterGroup.SoftwareCopyright.InitSoftwareCopyrightApiRouter(userPrivateGroup)
 		userRouterGroup.Study.InitResourceApiRouter(userPrivateGroup)
 		userRouterGroup.User.InitAuthApiRouter(userPrivateGroup)

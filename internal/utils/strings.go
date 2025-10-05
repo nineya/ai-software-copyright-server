@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"ai-software-copyright-server/internal/application/model/enum"
 	"crypto/rand"
 	"encoding/base64"
 	"math"
@@ -53,54 +52,6 @@ func CheckPhone(phone string) bool {
 func CheckEmail(email string) bool {
 	emailRegexp := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	return emailRegexp.MatchString(email)
-}
-
-// 字符串转换
-func TransformNetdiskType(url string) enum.NetdiskType {
-	switch {
-	case strings.Contains(url, "https://pan.quark.cn/s/"):
-		return enum.NetdiskType(2)
-	case strings.Contains(url, "https://pan.xunlei.com/s/"):
-		return enum.NetdiskType(3)
-	case strings.Contains(url, "https://pan.baidu.com/s/"):
-		return enum.NetdiskType(4)
-	case strings.Contains(url, "https://drive.uc.cn/s/"):
-		return enum.NetdiskType(5)
-	case strings.Contains(url, "https://caiyun.139.com/m/"):
-		return enum.NetdiskType(6)
-	case strings.Contains(url, "https://www.123684.com/s/"):
-		return enum.NetdiskType(7)
-	case strings.Contains(url, "https://pan.wkbrowser.com/netdisk/"):
-		return enum.NetdiskType(8)
-	case strings.Contains(url, "https://wap.diskyun.com/s/"):
-		return enum.NetdiskType(9)
-	default:
-		return enum.NetdiskType(1)
-	}
-}
-
-// 字符串转换
-func TransformNetdiskName(typ enum.NetdiskType) string {
-	switch typ {
-	case enum.NetdiskType(2):
-		return "夸克网盘"
-	case enum.NetdiskType(3):
-		return "迅雷网盘"
-	case enum.NetdiskType(4):
-		return "百度网盘"
-	case enum.NetdiskType(5):
-		return "UC网盘"
-	case enum.NetdiskType(6):
-		return "移动云盘"
-	case enum.NetdiskType(7):
-		return "123网盘"
-	case enum.NetdiskType(8):
-		return "悟空网盘"
-	case enum.NetdiskType(9):
-		return "快兔网盘"
-	default:
-		return "网络来源"
-	}
 }
 
 // 生成随机字符串

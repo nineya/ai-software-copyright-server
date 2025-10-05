@@ -55,7 +55,7 @@ func (s *CreditsOrderService) CreateOrder(userId int64, clientType enum.ClientTy
 		ClientType:  clientType,
 		WxOpenid:    clientInfo.WxOpenid,
 		Description: fmt.Sprintf("购买%d个积分", creditsPrice.Credits),
-		CreditsNum:  creditsPrice.Credits,
+		Credits:     creditsPrice.Credits,
 		OrderAmount: creditsPrice.Price,
 		Status:      enum.OrderStatus(1),
 	}
@@ -92,7 +92,7 @@ func (s *CreditsOrderService) PayNotify(request *http.Request) error {
 		}
 		_, err = GetUserService().ChangeCreditsRunning(creditsOrder.UserId, session, table.CreditsChange{
 			Type:          enum.CreditsChangeType(4),
-			ChangeCredits: creditsOrder.CreditsNum,
+			ChangeCredits: creditsOrder.Credits,
 			Remark:        creditsOrder.Description,
 		})
 		return err

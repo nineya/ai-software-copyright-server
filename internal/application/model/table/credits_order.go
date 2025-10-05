@@ -13,7 +13,7 @@ type CreditsOrder struct {
 	ClientType  enum.ClientType  `json:"clientType" xorm:"SMALLINT notnull comment('客户端类型')" label:"客户端类型"`
 	WxOpenid    string           `json:"wxOpenid" xorm:"VARCHAR(127) notnull comment('微信OpenId')" binding:"lte=127" label:"微信OpenId"` //微信用户id
 	Description string           `json:"description" xorm:"VARCHAR(127) notnull comment('订单描述')" label:"订单描述"`
-	CreditsNum  int              `json:"creditsNum" xorm:"INT notnull comment('币数量')" label:"币数量"`
+	Credits     int              `json:"credits" xorm:"INT notnull comment('积分数量')" label:"积分数量"`
 	OrderAmount string           `json:"orderAmount" xorm:"DECIMAL(11,2) notnull comment('订单总金额')" label:"订单总金额"`
 	Status      enum.OrderStatus `json:"status" xorm:"SMALLINT notnull comment('订单状态')" label:"订单状态"`
 	CreateTime  *time.Time       `json:"createTime" xorm:"DATETIME created"`

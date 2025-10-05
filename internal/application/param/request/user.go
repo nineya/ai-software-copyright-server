@@ -14,7 +14,7 @@ type UserLoginParam struct {
 type UserAddCreditsParam struct {
 	InviteCodes []string               `json:"inviteCodes" form:"inviteCodes" label:"邀请码列表"`
 	Type        enum.CreditsChangeType `json:"type" form:"type" binding:"required" label:"金额变动类型"`
-	AddCredits  int                    `json:"addCredits" form:"addCredits" binding:"required" label:"加币数量"`
+	AddCredits  int                    `json:"addCredits" form:"addCredits" binding:"required" label:"加积分数量"`
 	Remark      string                 `json:"remark,omitempty" form:"remark" binding:"lte=100" label:"备注"`
 }
 

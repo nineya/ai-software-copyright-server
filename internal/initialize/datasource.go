@@ -36,16 +36,11 @@ func InitDatabase() {
 }
 
 func syncTable(db *xorm.Engine) {
-	_, err := db.SyncWithOptions(xorm.SyncOptions{IgnoreDropIndices: true}, new(table.NetdiskResource))
-	if err != nil {
-		global.LOG.Error("Failed to synchronize the database table structure.", zap.Any("err", err))
-		return
-	}
-	err = db.Sync(
+	err := db.Sync(
 		//new(table.Admin),
 		new(table.Buy),
-		//new(table.Cdkey),
-		//new(table.CdkeyRecord),
+		new(table.Cdkey),
+		new(table.CdkeyRecord),
 		//new(table.ClientInfo),
 		new(table.CreditsChange),
 		new(table.CreditsOrder),

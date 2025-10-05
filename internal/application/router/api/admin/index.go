@@ -4,16 +4,14 @@ import (
 	"ai-software-copyright-server/internal/application/router/api/admin/admin"
 	"ai-software-copyright-server/internal/application/router/api/admin/cdkey"
 	"ai-software-copyright-server/internal/application/router/api/admin/public"
-	"ai-software-copyright-server/internal/application/router/api/admin/redbook"
 	"ai-software-copyright-server/internal/application/router/api/admin/user"
 )
 
 type RouterGroup struct {
-	Admin   admin.RouterGroup
-	Cdkey   cdkey.RouterGroup
-	Public  public.RouterGroup
-	Redbook redbook.RouterGroup
-	User    user.RouterGroup
+	Admin  admin.RouterGroup
+	Cdkey  cdkey.RouterGroup
+	Public public.RouterGroup
+	User   user.RouterGroup
 }
 
 // @title Tool Admin-API 文档

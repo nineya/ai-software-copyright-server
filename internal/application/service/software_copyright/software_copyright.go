@@ -604,7 +604,8 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 				// 等待 JavaScript 执行
 				chromedp.Sleep(2*time.Second),
 				// 截图
-				chromedp.FullScreenshot(&imageBytes, 100),
+				chromedp.CaptureScreenshot(&imageBytes),
+				//chromedp.FullScreenshot(&imageBytes, 100), // 这个是截所有内容，不符合要求
 			)
 			if err != nil {
 				global.LOG.Error(fmt.Sprintf("生成用户手册%s的demo运行截图失败：%+v", item.Name, err))

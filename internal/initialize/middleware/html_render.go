@@ -109,7 +109,6 @@ func loadHTMLGlob(delimLeft, delimRight string) *template.Template {
 		"Default":      Func.Default,
 		"Switch":       Func.Switch,
 		"Params":       Func.Params,
-		"NetdiskName":  Func.NetdiskName,
 		"Split":        strings.Split,
 		"Contains":     strings.Contains,
 		"ReplaceAll":   strings.ReplaceAll,

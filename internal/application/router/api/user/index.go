@@ -3,10 +3,7 @@ package user
 import (
 	"ai-software-copyright-server/internal/application/router/api/user/cdkey"
 	"ai-software-copyright-server/internal/application/router/api/user/credits"
-	"ai-software-copyright-server/internal/application/router/api/user/netdisk"
 	"ai-software-copyright-server/internal/application/router/api/user/public"
-	"ai-software-copyright-server/internal/application/router/api/user/qrcode"
-	"ai-software-copyright-server/internal/application/router/api/user/redbook"
 	"ai-software-copyright-server/internal/application/router/api/user/software_copyright"
 	"ai-software-copyright-server/internal/application/router/api/user/study"
 	"ai-software-copyright-server/internal/application/router/api/user/user"
@@ -15,10 +12,7 @@ import (
 type RouterGroup struct {
 	Cdkey             cdkey.RouterGroup
 	Credits           credits.RouterGroup
-	Netdisk           netdisk.RouterGroup
 	Public            public.RouterGroup
-	Qrcode            qrcode.RouterGroup
-	Redbook           redbook.RouterGroup
 	SoftwareCopyright software_copyright.RouterGroup
 	Study             study.RouterGroup
 	User              user.RouterGroup
