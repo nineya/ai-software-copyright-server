@@ -55,6 +55,7 @@ func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopy
 		return nil, err
 	}
 	param.UserId = userId
+	param.Progress = 1
 	param.Status = enum.SoftwareCopyrightStatus(1)
 
 	result := &response.UserBuyResponse{}
@@ -128,19 +129,19 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	}
 
 	// *分析用户需求
-	result, err := difyPlugin.GetDifyPlugin().SendChat(s.ApiKey, param)
+	requirementJson, conversationId, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("分析用户需求失败：%+v", err))
 		return
 	}
 	requirements := make([]response.SCRequirementItemResponse, 0)
-	err = json.Unmarshal([]byte(result.Answer), &requirements)
+	err = json.Unmarshal([]byte(requirementJson), &requirements)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("用户需求结果解析失败：%+v", err))
 		return
 	}
-	sc.ConversationId = result.ConversationId
-	param.ConversationId = result.ConversationId
+	sc.ConversationId = conversationId
+	param.ConversationId = conversationId
 	// 软著进度
 	progressCount := 8 + (len(requirements) * 4)
 	progressCurrent := 1 + len(requirements)
@@ -274,7 +275,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	funcData = append(funcData, []string{"编程语言", sc.CodeLang})
 	funcData = append(funcData, []string{"源程序量", strconv.Itoa(25000 + rand.Intn(10000))})
 	param.Inputs["mode"] = "软著登记"
-	requestStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	requestStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成软著申请登记信息失败：%+v", err))
 		return
@@ -305,7 +306,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 
 	// *生成源代码
 	param.Inputs["mode"] = "源代码"
-	codeStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	codeStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成软件源代码失败：%+v", err))
 		return
@@ -513,7 +514,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 ...
 ## 1.3 目标用户
 ...`
-	bookStr, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	bookStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成用户手册的引言失败：%+v", err))
 		return
@@ -526,7 +527,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	bookDoc.AddHeadingParagraph("第二章 软件概述", 1)
 	param.Query = `请结合软件的功能和信息，帮我完成软件概述章节的编写。容要丰富、有深度，可以分多段回答。
 直接回复章节内容，不用包含大标题，不要有其他任何的解释说明。`
-	bookStr, err = difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	bookStr, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成用户手册的软件概述失败：%+v", err))
 		return
@@ -544,7 +545,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 ...
 ## 3.2 运行软件环境
 ...`
-	bookStr, err = difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+	bookStr, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成用户手册的软件概述失败：%+v", err))
 		return
@@ -581,7 +582,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 %s
 `, item.Name, item.Desc, item.Operation, htmlContent)
 		param.Inputs["mode"] = "demo"
-		htmlResult, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+		htmlResult, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 		if err != nil {
 			global.LOG.Error(fmt.Sprintf("生成用户手册%s的demo失败：%+v", item.Name, err))
 		} else {
@@ -621,7 +622,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		// 生成操作流程图
 		param.Query = item.Operation
 		param.Inputs["mode"] = "流程图"
-		base64Text, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+		base64Text, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 		if err != nil {
 			global.LOG.Error(fmt.Sprintf("生成用户手册%s的流程图失败：%+v", item.Name, err))
 		} else {

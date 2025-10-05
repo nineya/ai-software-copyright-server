@@ -40,10 +40,11 @@ func (p *DifyPlugin) SendChat(apiKey string, param DifyChatMessageParam) (*DifyC
 	return &result, err
 }
 
-func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (string, error) {
+func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (string, string, error) {
 	param.ResponseMode = "streaming"
 
 	resultText := ""
+	conversationId := ""
 	err := p.sendSSERequest("/chat-messages", apiKey, param, func(content string) error {
 		content = strings.TrimPrefix(content, "data:")
 
@@ -55,9 +56,12 @@ func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (str
 		if result.Event == "message" {
 			resultText += result.Answer
 		}
+		if conversationId == "" {
+			conversationId = result.ConversationId
+		}
 		return nil
 	})
-	return resultText, err
+	return resultText, conversationId, err
 }
 
 func (p *DifyPlugin) sendRequest(url, apiKey string, param any) ([]byte, error) {
