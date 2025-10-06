@@ -259,16 +259,12 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	}
 	switch sc.Category {
 	case "小程序":
-		funcData = append(funcData, []string{"运行平台/操作系统", "微信小程序", "可以酌情修改"})
 		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "微信小程序", "可以酌情修改"})
 	case "手机APP":
-		funcData = append(funcData, []string{"运行平台/操作系统", "Android 10或更高版本, iOS 14或更高版本", "可以酌情修改"})
 		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "Android 10或更高版本, iOS 14或更高版本", "可以酌情修改"})
 	case "WEB应用":
-		funcData = append(funcData, []string{"运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
 		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
 	case "桌面软件":
-		funcData = append(funcData, []string{"运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
 		funcData = append(funcData, []string{"该软件的运行平台/操作系统", "Linux, Microsoft Windows, macOS", "可以酌情修改"})
 	}
 	funcData = append(funcData, []string{"软件运行支撑环境/支持软件", "客户端：SQLite3；服务端：Nginx, MySQL, Redis", "可以酌情修改"})
@@ -658,6 +654,14 @@ func (s *SoftwareCopyrightService) GetByPage(userId int64, param request.QueryPa
 	}
 	list := make([]table.SoftwareCopyright, 0)
 	return s.HandlePageable(param.PageableParam, &list, session)
+}
+
+// 软著数量统计
+func (s *SoftwareCopyrightService) Statistic(userId int64) (*table.SoftwareCopyrightStatistic, error) {
+	// 今天访问数据
+	statistic := &table.SoftwareCopyrightStatistic{}
+	_, err := s.WhereUserSession(userId).Select("COUNT(*) AS total_count, COUNT(CASE WHEN status = 1 THEN 1 END) AS generate_count, COUNT(CASE WHEN status != 1 THEN 1 END) AS complete_count").Get(statistic)
+	return statistic, err
 }
 
 // 将md文档转为word内容

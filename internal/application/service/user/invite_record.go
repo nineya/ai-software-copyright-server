@@ -4,7 +4,6 @@ import (
 	"ai-software-copyright-server/internal/application/model/table"
 	"ai-software-copyright-server/internal/application/service"
 	"ai-software-copyright-server/internal/global"
-	"strconv"
 	"sync"
 )
 
@@ -24,16 +23,8 @@ func GetInviteRecordService() *InviteRecordService {
 	return inviteRecordService
 }
 
-func (s *InviteRecordService) GetInviteInfo(userId int64) (*table.InviteInfo, error) {
-	mod := &table.InviteInfo{}
-	results, err := s.Db.QueryString(`select * from 
-(select count(*) invite_num, sum(reward_credits) invite_credits from invite_record where user_id = ? and type = 1) a,
-(select sum(reward_credits) active_credits from invite_record where user_id = ? and type = 2) b`, userId, userId)
-	if err != nil {
-		return nil, err
-	}
-	mod.InviteNum, _ = strconv.Atoi(results[0]["invite_num"])
-	mod.InviteCredits, _ = strconv.Atoi(results[0]["invite_credits"])
-	mod.ActiveCredits, _ = strconv.Atoi(results[0]["active_credits"])
+func (s *InviteRecordService) Statistic(userId int64) (*table.InviteStatistic, error) {
+	mod := &table.InviteStatistic{}
+	_, err := s.WhereUserSession(userId).Select("COUNT(*) AS total_count, sum(CASE WHEN type = 1 THEN reward_coin END) AS invite_credits, count(CASE WHEN type = 1 and create_time >= DATE_SUB(NOW(), INTERVAL 1 MONTH) THEN 1 END) AS month_count").Get(mod)
 	return mod, err
 }

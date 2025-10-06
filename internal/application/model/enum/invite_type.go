@@ -8,7 +8,6 @@ var INVITE_TYPE = [...]string{
 	"",         // 0, 未定义
 	"REGISTER", // 1,注册
 	"ACTIVE",   // 2,活跃
-	"PLANTING", // 3,种草
 }
 
 type InviteType uint

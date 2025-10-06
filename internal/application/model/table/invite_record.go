@@ -25,8 +25,13 @@ func (t *InviteRecord) SetUserId(userId int64) {
 	t.UserId = userId
 }
 
-type InviteInfo struct {
-	InviteNum     int `json:"inviteNum"`
-	InviteCredits int `json:"inviteCredits"`
-	ActiveCredits int `json:"activeCredits"`
+type InviteStatistic struct {
+	TotalCount    int `json:"totalCount"`    // 邀请总人数
+	InviteCredits int `json:"inviteCredits"` //邀请积分
+	VipCount      int `json:"vipCount"`      // VIP人数
+	MonthCount    int `json:"monthCount"`    //月邀请人数
+}
+
+func (InviteStatistic) TableName() string {
+	return "invite_record"
 }

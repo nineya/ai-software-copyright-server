@@ -31,7 +31,8 @@ type JWT struct {
 
 type Weixin struct {
 	Merchant    Merchant    `mapstructure:"merchant" json:"merchant" yaml:"merchant"`
-	MiniProgram MiniProgram `mapstructure:"mini-program" json:"miniProgram" yaml:"mini-program"`
+	Site        Site        `mapstructure:"site" json:"site" yaml:"site"`                        // 网站
+	MiniProgram MiniProgram `mapstructure:"mini-program" json:"miniProgram" yaml:"mini-program"` // 小程序
 }
 
 type Merchant struct {
@@ -40,6 +41,15 @@ type Merchant struct {
 	SerialNo       string `mapstructure:"serial-no" json:"serialNo" yaml:"serial-no"`
 	PrivateKeyPath string `mapstructure:"private-key-path" json:"privateKeyPath" yaml:"private-key-path"`
 	NotifyUrl      string `mapstructure:"notify-url" json:"notifyUrl" yaml:"notify-url"`
+}
+
+type Site struct {
+	Main SiteItem `mapstructure:"main" json:"main" yaml:"main"`
+}
+
+type SiteItem struct {
+	Appid  string `mapstructure:"appid" json:"appid" yaml:"appid"`
+	Secret string `mapstructure:"secret" json:"secret" yaml:"secret"`
 }
 
 type MiniProgram struct {

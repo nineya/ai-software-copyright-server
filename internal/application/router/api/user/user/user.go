@@ -23,7 +23,6 @@ func (m *UserApiRouter) InitUserApiRouter(Router *gin.RouterGroup) {
 	router.POST("rewardAd", m.RewardAd)
 	router.POST("rewardGoods", m.RewardGoods)
 	router.PUT("updateInfo", m.UpdateUserInfo)
-	router.GET("getInviteInfo", m.GetInviteInfo)
 	router.GET("getInviteCode", m.GetInviteCode)
 	router.GET("profiles", m.GetProfiles)
 }
@@ -105,22 +104,6 @@ func (m *UserApiRouter) UpdateUserInfo(c *gin.Context) {
 		return
 	}
 	m.UserLog(c, "USER_INFO_UPDATE", "用户信息更新")
-	response.OkWithData(mod, c)
-}
-
-// @summary Get user invite Info
-// @description Get user invite Info
-// @tags user
-// @accept json
-// @success 200 {object} response.Response{data=table.InviteInfo}
-// @security user
-// @router /user/getInviteInfo [post]
-func (m *UserApiRouter) GetInviteInfo(c *gin.Context) {
-	mod, err := userSev.GetInviteRecordService().GetInviteInfo(m.GetUserId(c))
-	if err != nil {
-		response.FailWithError(err, c)
-		return
-	}
 	response.OkWithData(mod, c)
 }
 

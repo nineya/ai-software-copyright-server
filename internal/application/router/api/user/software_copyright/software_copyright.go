@@ -21,6 +21,7 @@ func (m *SoftwareCopyrightApiRouter) InitSoftwareCopyrightApiRouter(Router *gin.
 	router.POST("", m.Create)
 	router.GET("list", m.GetByPage)
 	router.GET(":id", m.GetById)
+	router.GET("statistic", m.Statistic)
 }
 
 // @summary 创建软著申请
@@ -89,4 +90,20 @@ func (m *SoftwareCopyrightApiRouter) GetByPage(c *gin.Context) {
 		return
 	}
 	response.OkWithData(page, c)
+}
+
+// @summary 软著申请数量统计
+// @description 软著申请数量统计
+// @tags softwareCopyright
+// @accept json
+// @success 200 {object} response.Response{data=table.SoftwareCopyrightStatistic}
+// @security user
+// @router /softwareCopyright/statistic [get]
+func (m *SoftwareCopyrightApiRouter) Statistic(c *gin.Context) {
+	mod, err := scSev.GetSoftwareCopyrightService().Statistic(m.GetUserId(c))
+	if err != nil {
+		response.FailWithError(err, c)
+		return
+	}
+	response.OkWithData(mod, c)
 }

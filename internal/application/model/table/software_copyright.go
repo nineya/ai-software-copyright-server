@@ -29,3 +29,13 @@ func (SoftwareCopyright) TableName() string {
 func (t *SoftwareCopyright) SetUserId(userId int64) {
 	t.UserId = userId
 }
+
+type SoftwareCopyrightStatistic struct {
+	TotalCount    int    `json:"totalCount"`    // 总数量
+	GenerateCount int    `json:"generateCount"` // 生成中数量
+	CompleteCount string `json:"completeCount"` // 已完成数量
+}
+
+func (SoftwareCopyrightStatistic) TableName() string {
+	return "software_copyright"
+}

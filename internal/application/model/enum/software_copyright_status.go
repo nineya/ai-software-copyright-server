@@ -6,7 +6,7 @@ import (
 
 var SOFTWARE_COPYRIGHT_STATUS = [...]string{
 	"",         // 0,未定义
-	"GENERATE", // 1,创建中
+	"GENERATE", // 1,生成中
 	"COMPLETE", // 2,已完成
 	"FAILURE",  // 3,失败
 }

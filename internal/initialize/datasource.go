@@ -37,7 +37,8 @@ func InitDatabase() {
 
 func syncTable(db *xorm.Engine) {
 	err := db.Sync(
-		//new(table.Admin),
+		new(table.Admin),
+		new(table.AdminLog),
 		new(table.Buy),
 		new(table.Cdkey),
 		new(table.CdkeyRecord),
