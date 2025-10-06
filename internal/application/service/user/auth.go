@@ -90,8 +90,8 @@ func (s *AuthService) Register(param request.UserInfoParam) error {
 			if !exist {
 				return errors.New("邀请码不存在")
 			}
-			myRewardCredits.ChangeCredits = 50
-			myRewardCredits.Remark = "您的好友邀请了您，并送了您50个积分"
+			myRewardCredits.ChangeCredits = 100
+			myRewardCredits.Remark = "您的好友邀请了您，并送了您100个积分"
 		}
 		// 奖励用户自己
 		user, err := GetUserService().ChangeCreditsRunning(mod.Id, session, myRewardCredits)

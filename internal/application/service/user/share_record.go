@@ -1,10 +1,13 @@
 package user
 
 import (
+	"ai-software-copyright-server/internal/application/model/enum"
 	"ai-software-copyright-server/internal/application/model/table"
 	"ai-software-copyright-server/internal/application/service"
 	"ai-software-copyright-server/internal/global"
+	"github.com/pkg/errors"
 	"sync"
+	"xorm.io/xorm"
 )
 
 type ShareRecordService struct {
@@ -21,6 +24,40 @@ func GetShareRecordService() *ShareRecordService {
 		shareRecordService.Db = global.DB
 	})
 	return shareRecordService
+}
+
+// 审核分享
+func (s *ShareRecordService) Audit(param table.ShareRecord) (*table.ShareRecord, error) {
+	mod := &table.ShareRecord{}
+	exist, err := s.WhereUserSession(param.UserId).ID(param.Id).Get(mod)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, errors.New("分享记录不存在")
+	}
+	mod.Status = param.Status
+	mod.Remark = param.Remark
+	err = s.DbTransaction(func(session *xorm.Session) error {
+		// 审核通过，需要奖励分享的用户
+		if param.Status == enum.ShareStatus(2) || param.RewardCredits > 0 {
+			mod.RewardCredits = param.RewardCredits
+			rewardCredits := table.CreditsChange{
+				Type:          enum.CreditsChangeType(2),
+				ChangeCredits: param.RewardCredits,
+				Remark:        "分享使用体验赠送积分",
+			}
+			// 奖励用户自己
+			_, err = GetUserService().ChangeCreditsRunning(mod.Id, session, rewardCredits)
+			if err != nil {
+				return err
+			}
+		}
+		// 更新分享记录
+		_, err = session.ID(mod.Id).Update(mod)
+		return err
+	})
+	return mod, err
 }
 
 func (s *ShareRecordService) Statistic(userId int64) (*table.ShareStatistic, error) {
