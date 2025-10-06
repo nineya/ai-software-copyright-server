@@ -267,6 +267,12 @@ func (s *UserService) GetById(id int64) (*table.User, error) {
 	return mod, err
 }
 
+func (s *UserService) GetByWxUnionid(wxUnionid string) (*table.User, error) {
+	mod := &table.User{WxUnionid: wxUnionid}
+	_, err := s.Db.Get(mod)
+	return mod, err
+}
+
 func (s *UserService) GetAndCheckBalance(userId int64, credits int) (*table.User, error) {
 	user, err := s.GetById(userId)
 	if err != nil {

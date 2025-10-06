@@ -1,4 +1,4 @@
-package weixin
+package wechat
 
 import (
 	"ai-software-copyright-server/internal/application/model/table"

@@ -24,6 +24,7 @@ func (m *AuthApiRouter) InitAuthApiRouter(router *gin.RouterGroup) {
 	router.POST("refresh_token", m.RefreshToken)
 	router.POST("captcha", m.Captcha)
 	router.POST("register", m.Register)
+	router.GET("authorization", m.Authorization)
 }
 
 // @summary User login
@@ -112,7 +113,7 @@ func (m *AuthApiRouter) Register(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	err = userSev.GetAuthService().Register(param)
+	_, err = userSev.GetAuthService().Register(param)
 	if err != nil {
 		m.UserLog(c, "FAILED_LOGIN", fmt.Sprintf("用户注册失败，原因：%s", err.Error()))
 		response.FailWithError(err, c)
@@ -120,4 +121,25 @@ func (m *AuthApiRouter) Register(c *gin.Context) {
 	}
 	m.UserLog(c, "USER_LOGIN", fmt.Sprintf("用户 %s 注册", param.Nickname))
 	response.Ok(c)
+}
+
+// @summary 微信登录授权
+// @description 微信登录授权
+// @tags public,user
+// @accept json
+// @param code query string true "登录授权码"
+// @param inviter query string true "邀请码"
+// @success 200 {object} response.Response{data=response.TokenResponse}
+// @router /public/authorization [get]
+func (m *AuthApiRouter) Authorization(c *gin.Context) {
+	code := c.Query("code")
+	inviter := c.Query("inviter")
+	token, err := userSev.GetAuthService().Authorization(code, inviter)
+	if err != nil {
+		m.UserLog(c, "FAILED_LOGIN", fmt.Sprintf("试图登录 code = %s 失败，原因：%s", code, err.Error()))
+		response.FailWithError(err, c)
+		return
+	}
+	m.UserLog(c, "USER_LOGIN", fmt.Sprintf("账号 code = %s 登录成功", code))
+	response.OkWithData(token, c)
 }

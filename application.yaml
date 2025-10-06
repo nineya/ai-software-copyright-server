@@ -28,6 +28,10 @@ weixin:
     serial-no: 6A38DD3B7C5405D3A3421BA2DCC713AC902273AB
     private-key-path: apiclient_key.pem
     notify-url: https://tool.nineya.com/api/user/public/wxNotify/pay
+  site:
+    main:
+      appid: wxfba8b11f4b286063
+      secret: ab8fd70b78aa1c54134bfbf13b3685ce
   mini-program:
     blogger-helper:
       appid: wx4af5d518ac7bf610

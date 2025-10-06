@@ -4,7 +4,7 @@ import (
 	"ai-software-copyright-server/internal/application/model/enum"
 	"ai-software-copyright-server/internal/application/model/table"
 	"ai-software-copyright-server/internal/application/service"
-	wxSev "ai-software-copyright-server/internal/application/service/weixin"
+	wechatSev "ai-software-copyright-server/internal/application/service/wechat"
 	"ai-software-copyright-server/internal/global"
 	"errors"
 	"sync"
@@ -34,7 +34,7 @@ func (s *ClientInfoService) MsgSecCheck(userId int64, clientType enum.ClientType
 	if err != nil || clientInfo.Id == 0 {
 		return errors.New("获取客户端信息失败")
 	}
-	return wxSev.GetMiniProgramService().MsgSecCheck(clientType, clientInfo.WxOpenid, msg)
+	return wechatSev.GetMiniProgramService().MsgSecCheck(clientType, clientInfo.WxOpenid, msg)
 }
 
 func (s *ClientInfoService) GetClientInfo(userId int64, clientType enum.ClientType) (table.ClientInfo, error) {
@@ -58,7 +58,7 @@ func (s *ClientInfoService) GetInviteCode(userId int64, clientType enum.ClientTy
 	if err != nil {
 		return "", err
 	}
-	upload, err := wxSev.GetMiniProgramService().SaveInviteCode(clientType, user.InviteCode, "user")
+	upload, err := wechatSev.GetMiniProgramService().SaveInviteCode(clientType, user.InviteCode, "user")
 	if err != nil {
 		return "", err
 	}

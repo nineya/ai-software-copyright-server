@@ -46,6 +46,8 @@ func syncTable(db *xorm.Engine) {
 		new(table.CreditsChange),
 		new(table.CreditsOrder),
 		new(table.CreditsPrice),
+		new(table.InviteRecord),
+		new(table.ShareRecord),
 		new(table.SoftwareCopyright),
 		new(table.Statistic),
 		new(table.User),

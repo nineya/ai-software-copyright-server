@@ -1,4 +1,4 @@
-package weixin
+package wechat
 
 import (
 	"ai-software-copyright-server/internal/application/model/enum"
@@ -35,7 +35,7 @@ func GetMiniProgramService() *MiniProgramService {
 }
 
 // 通过授权码获取用户id
-func (s *MiniProgramService) WeixinSessionLogin(clientType enum.ClientType, code string) (*response.WeixinSessionResponse, error) {
+func (s *MiniProgramService) WeixinSessionLogin(clientType enum.ClientType, code string) (*response.WechatSessionResponse, error) {
 	mpConfig, err := utils.MiniProgramConfig(clientType)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (s *MiniProgramService) WeixinSessionLogin(clientType enum.ClientType, code
 	}
 	global.LOG.Info("微信小程序：通过授权码获取用户信息", zap.String("result", string(content)))
 
-	var result response.WeixinSessionResponse // 反序列化JSON到结构体
+	var result response.WechatSessionResponse // 反序列化JSON到结构体
 	err = json.Unmarshal(content, &result)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (s *MiniProgramService) WeixinCgiBinAccessToken(clientType enum.ClientType)
 		return "", err
 	}
 
-	var result response.WeixinCgiBinAccessTokenResponse // 反序列化JSON到结构体
+	var result response.WechatCgiBinAccessTokenResponse // 反序列化JSON到结构体
 	err = json.Unmarshal(content, &result)
 	if err != nil {
 		return "", err
@@ -154,7 +154,7 @@ func (s *MiniProgramService) MsgSecCheck(clientType enum.ClientType, openid, msg
 		return err
 	}
 
-	var result response.WeixinMsgSecCheckResponse // 反序列化JSON到结构体
+	var result response.WechatMsgSecCheckResponse // 反序列化JSON到结构体
 	err = json.Unmarshal(content, &result)
 	if err != nil {
 		return err

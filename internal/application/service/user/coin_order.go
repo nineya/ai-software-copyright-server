@@ -6,7 +6,7 @@ import (
 	"ai-software-copyright-server/internal/application/param/request"
 	"ai-software-copyright-server/internal/application/param/response"
 	"ai-software-copyright-server/internal/application/service"
-	wxSev "ai-software-copyright-server/internal/application/service/weixin"
+	wechatSev "ai-software-copyright-server/internal/application/service/wechat"
 	"ai-software-copyright-server/internal/global"
 	"fmt"
 	"github.com/pkg/errors"
@@ -59,7 +59,7 @@ func (s *CreditsOrderService) CreateOrder(userId int64, clientType enum.ClientTy
 		OrderAmount: creditsPrice.Price,
 		Status:      enum.OrderStatus(1),
 	}
-	appletParams, err := wxSev.GetWechatPayService().CreateOrder(order)
+	appletParams, err := wechatSev.GetWechatPayService().CreateOrder(order)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *CreditsOrderService) CreateOrder(userId int64, clientType enum.ClientTy
 
 // 支付回调通知
 func (s *CreditsOrderService) PayNotify(request *http.Request) error {
-	result, err := wxSev.GetWechatPayService().PayNotify(request)
+	result, err := wechatSev.GetWechatPayService().PayNotify(request)
 	if err != nil {
 		return err
 	}
