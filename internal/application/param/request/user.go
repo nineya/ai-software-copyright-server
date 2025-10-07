@@ -34,13 +34,14 @@ type UserInviterCreditsParam struct {
 	Remark        string          `json:"remark,omitempty" form:"remark" binding:"lte=100" label:"备注"`
 }
 
-type UserInfoParam struct {
-	Avatar    string `json:"avatar" label:"头像地址"`
-	Nickname  string `json:"nickname" binding:"required,lte=127" label:"昵称"`
-	Phone     string `json:"phone" form:"phone" binding:"required,lte=15" label:"手机"`
-	Email     string `json:"email" form:"email" binding:"required,lte=127" label:"邮箱"`
-	Password  string `json:"password" form:"password" binding:"required,lte=100" label:"密码"`
-	WxUnionid string `json:"-" form:"-" label:"微信Unionid"` //微信用户id
-	WxOpenid  string `json:"-" form:"-" label:"微信Openid"`  //微信用户id
-	Inviter   string `json:"inviter" binding:"lte=10" label:"邀请人"`
-}
+// 原本用于注册，现在发现没用了
+//type UserInfoParam struct {
+//	Avatar    string `json:"avatar" label:"头像地址"`
+//	Nickname  string `json:"nickname" binding:"required,lte=127" label:"昵称"`
+//	Phone     string `json:"phone" form:"phone" binding:"required,lte=15" label:"手机"`
+//	Email     string `json:"email" form:"email" binding:"required,lte=127" label:"邮箱"`
+//	Password  string `json:"password" form:"password" binding:"required,lte=100" label:"密码"`
+//	WxUnionid string `json:"-" form:"-" label:"微信Unionid"` //微信用户id
+//	WxOpenid  string `json:"-" form:"-" label:"微信Openid"`  //微信用户id
+//	Inviter   string `json:"inviter" binding:"lte=10" label:"邀请人"`
+//}

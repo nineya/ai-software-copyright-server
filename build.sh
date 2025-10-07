@@ -28,7 +28,7 @@ LDFlags=" \
     -X 'ai-software-copyright-server/internal/global.Version=${Version}' \
     -X 'ai-software-copyright-server/internal/global.tBuildTime=${BuildTime}' \
     -X 'ai-software-copyright-server/internal/global.BuildGoVersion=${BuildGoVersion}' \
-    -X 'ai-software-copyright-server/internal/global.Host=https://ai.nineya.com' \
+    -X 'ai-software-copyright-server/internal/global.Host=https://rz.nineya.com' \
 "
 
 echo "Build start"

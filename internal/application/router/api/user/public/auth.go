@@ -1,16 +1,20 @@
 package public
 
 import (
+	"ai-software-copyright-server/internal/application/model/table"
 	"ai-software-copyright-server/internal/application/param/request"
 	"ai-software-copyright-server/internal/application/param/response"
 	"ai-software-copyright-server/internal/application/router/api"
 	userSev "ai-software-copyright-server/internal/application/service/user"
 	"ai-software-copyright-server/internal/global"
 	"ai-software-copyright-server/internal/utils"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
 	"go.uber.org/zap"
+	"net/http"
+	"net/url"
 )
 
 type AuthApiRouter struct {
@@ -103,11 +107,11 @@ func (m *AuthApiRouter) Captcha(c *gin.Context) {
 // @description User register
 // @tags public,user
 // @accept json
-// @param param body request.UserInfoParam true "User information"
+// @param param body table.User true "User information"
 // @success 200 {object} response.Response{data=response.UserLoginResponse}
 // @router /public/register [post]
 func (m *AuthApiRouter) Register(c *gin.Context) {
-	var param request.UserInfoParam
+	var param table.User
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.FailWithError(err, c)
@@ -135,11 +139,17 @@ func (m *AuthApiRouter) Authorization(c *gin.Context) {
 	code := c.Query("code")
 	inviter := c.Query("inviter")
 	token, err := userSev.GetAuthService().Authorization(code, inviter)
+	result := response.Response{}
 	if err != nil {
+		result.Status = 500
+		result.Message = err.Error()
 		m.UserLog(c, "FAILED_LOGIN", fmt.Sprintf("试图登录 code = %s 失败，原因：%s", code, err.Error()))
-		response.FailWithError(err, c)
-		return
+	} else {
+		result.Status = 200
+		result.Data = token
+		m.UserLog(c, "USER_LOGIN", fmt.Sprintf("账号 code = %s 登录成功", code))
 	}
-	m.UserLog(c, "USER_LOGIN", fmt.Sprintf("账号 code = %s 登录成功", code))
-	response.OkWithData(token, c)
+	// 对登录结果进行编码，通过路由hash传输
+	resultBytes, _ := json.Marshal(result)
+	c.Redirect(http.StatusFound, global.Host+"/user/loginCallback#"+url.QueryEscape(string(resultBytes)))
 }

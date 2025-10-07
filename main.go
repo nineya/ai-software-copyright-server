@@ -17,7 +17,7 @@ func main() {
 	initialize.InitDatabase()
 	initialize.InitRedis()
 	initialize.InitCache()
-	initialize.InitWechatPay()
+	//initialize.InitWechatPay()
 	initialize.InitCron()
 	router := initialize.InitRouter()
 	initialize.RunServer(router)

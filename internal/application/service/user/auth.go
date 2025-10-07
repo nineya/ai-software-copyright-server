@@ -53,9 +53,10 @@ func (s *AuthService) Login(param request.UserLoginParam) (*common.Token, error)
 	return utils.AuthToken(user.Id, global.User)
 }
 
-func (s *AuthService) Register(param request.UserInfoParam) (*table.User, error) {
-	if param.Phone != "" {
-		exist, err := s.Db.Get(&table.User{Phone: &param.Phone})
+func (s *AuthService) Register(param table.User) (*table.User, error) {
+	// 用户实体
+	if param.Phone != nil {
+		exist, err := s.Db.Get(&table.User{Phone: param.Phone})
 		if err != nil {
 			return nil, errors.Wrap(err, "查询手机号失败")
 		}
@@ -63,8 +64,8 @@ func (s *AuthService) Register(param request.UserInfoParam) (*table.User, error)
 			return nil, errors.New("该手机号已注册")
 		}
 	}
-	if param.Email != "" {
-		exist, err := s.Db.Get(&table.User{Email: &param.Email})
+	if param.Email != nil {
+		exist, err := s.Db.Get(&table.User{Email: param.Email})
 		if err != nil {
 			return nil, errors.Wrap(err, "查询邮箱失败")
 		}
@@ -72,18 +73,15 @@ func (s *AuthService) Register(param request.UserInfoParam) (*table.User, error)
 			return nil, errors.New("该邮箱已注册")
 		}
 	}
-
-	// 新增用户
-	mod := &table.User{Nickname: param.Nickname, Phone: &param.Phone, Email: &param.Email, WxUnionid: param.WxUnionid, WxOpenid: param.WxOpenid, Inviter: param.Inviter}
 	if param.Password != "" {
 		hashPwd, err := bcrypt.GenerateFromPassword(utils.Md5ByBytes(param.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return nil, errors.Wrap(err, "密码不符合要求")
 		}
-		mod.Password = string(hashPwd)
+		param.Password = string(hashPwd)
 	}
 	err := s.DbTransaction(func(session *xorm.Session) error {
-		_, err := session.Insert(mod)
+		_, err := session.Insert(&param)
 		if err != nil {
 			return err
 		}
@@ -104,30 +102,30 @@ func (s *AuthService) Register(param request.UserInfoParam) (*table.User, error)
 			myRewardCredits.Remark = "您的好友邀请了您，并送了您100个积分"
 		}
 		// 奖励用户自己
-		user, err := GetUserService().ChangeCreditsRunning(mod.Id, session, myRewardCredits)
+		user, err := GetUserService().ChangeCreditsRunning(param.Id, session, myRewardCredits)
 		if err != nil {
 			return err
 		}
-		mod = user
+		param = *user
 		// 添加邀请人的邀请奖励
 		if param.Inviter != "" {
 			inviterRewardCredits := request.UserInviterCreditsParam{
-				Inviter:       mod.Inviter,
+				Inviter:       param.Inviter,
 				Type:          enum.InviteType(1),
 				RewardCredits: 25,
-				Remark:        fmt.Sprintf("邀请新用户（%s）奖励25个积分", utils.MaskContent(mod.Nickname)),
+				Remark:        fmt.Sprintf("邀请新用户（%s）奖励25个积分", utils.MaskContent(param.Nickname)),
 			}
-			err = GetUserService().InviterCreditsRunning(mod.Id, session, inviterRewardCredits)
+			err = GetUserService().InviterCreditsRunning(param.Id, session, inviterRewardCredits)
 			if err != nil {
 				return err
 			}
 		}
 		// 生成邀请码
-		mod.InviteCode = strconv.FormatInt(mod.Id+10000, 10)
-		_, err = session.ID(mod.Id).Update(mod)
+		param.InviteCode = strconv.FormatInt(param.Id+10000, 10)
+		_, err = session.ID(param.Id).Update(param)
 		return err
 	})
-	return mod, err
+	return &param, err
 }
 
 // 微信授权登录
@@ -158,7 +156,7 @@ func (s *AuthService) Authorization(code, inviter string) (*common.Token, error)
 		if userInfoResult.Nickname == "" || userInfoResult.HeadImgUrl == "" {
 			return nil, errors.New("系统繁忙，请稍后重试")
 		}
-		userInfo := request.UserInfoParam{
+		userInfo := table.User{
 			Nickname:  userInfoResult.Nickname,
 			WxOpenid:  tokenResult.Openid,
 			WxUnionid: tokenResult.Unionid,

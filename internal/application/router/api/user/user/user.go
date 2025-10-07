@@ -7,10 +7,8 @@ import (
 	"ai-software-copyright-server/internal/application/param/response"
 	"ai-software-copyright-server/internal/application/router/api"
 	userSev "ai-software-copyright-server/internal/application/service/user"
-	"ai-software-copyright-server/internal/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 )
 
 type UserApiRouter struct {
@@ -22,7 +20,7 @@ func (m *UserApiRouter) InitUserApiRouter(Router *gin.RouterGroup) {
 	m.Router = router
 	router.POST("rewardAd", m.RewardAd)
 	router.POST("rewardGoods", m.RewardGoods)
-	router.PUT("updateInfo", m.UpdateUserInfo)
+	//router.PUT("updateInfo", m.UpdateUserInfo)
 	router.GET("getInviteCode", m.GetInviteCode)
 	router.GET("profiles", m.GetProfiles)
 }
@@ -75,37 +73,37 @@ func (m *UserApiRouter) RewardGoods(c *gin.Context) {
 	response.OkWithData(mod, c)
 }
 
-// @summary 更新用户信息
-// @description 更新用户信息
-// @tags user
-// @accept json
-// @success 200 {object} response.Response{data=*response.UserRewardResponse}
-// @security user
-// @router /user/updateInfo [put]
-func (m *UserApiRouter) UpdateUserInfo(c *gin.Context) {
-	var param request.UserInfoParam
-	err := c.ShouldBindJSON(&param)
-	if err != nil {
-		response.FailWithError(err, c)
-		return
-	}
-	if param.Phone != "" && !utils.CheckPhone(param.Phone) {
-		response.FailWithError(errors.New("手机号格式错误"), c)
-		return
-	}
-	if param.Email != "" && !utils.CheckEmail(param.Email) {
-		response.FailWithError(errors.New("邮箱格式错误"), c)
-		return
-	}
-	mod, err := userSev.GetUserService().UpdateUserInfo(m.GetUserId(c), param)
-	if err != nil {
-		m.UserLog(c, "USER_INFO_UPDATE", fmt.Sprintf("用户信息更新失败，原因：%s", err.Error()))
-		response.FailWithError(err, c)
-		return
-	}
-	m.UserLog(c, "USER_INFO_UPDATE", "用户信息更新")
-	response.OkWithData(mod, c)
-}
+//// @summary 更新用户信息
+//// @description 更新用户信息
+//// @tags user
+//// @accept json
+//// @success 200 {object} response.Response{data=*response.UserRewardResponse}
+//// @security user
+//// @router /user/updateInfo [put]
+//func (m *UserApiRouter) UpdateUserInfo(c *gin.Context) {
+//	var param request.UserInfoParam
+//	err := c.ShouldBindJSON(&param)
+//	if err != nil {
+//		response.FailWithError(err, c)
+//		return
+//	}
+//	if param.Phone != "" && !utils.CheckPhone(param.Phone) {
+//		response.FailWithError(errors.New("手机号格式错误"), c)
+//		return
+//	}
+//	if param.Email != "" && !utils.CheckEmail(param.Email) {
+//		response.FailWithError(errors.New("邮箱格式错误"), c)
+//		return
+//	}
+//	mod, err := userSev.GetUserService().UpdateUserInfo(m.GetUserId(c), param)
+//	if err != nil {
+//		m.UserLog(c, "USER_INFO_UPDATE", fmt.Sprintf("用户信息更新失败，原因：%s", err.Error()))
+//		response.FailWithError(err, c)
+//		return
+//	}
+//	m.UserLog(c, "USER_INFO_UPDATE", "用户信息更新")
+//	response.OkWithData(mod, c)
+//}
 
 // @summary Get invite code url
 // @description Get invite code url

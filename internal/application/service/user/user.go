@@ -4,13 +4,10 @@ import (
 	"ai-software-copyright-server/internal/application/model/enum"
 	"ai-software-copyright-server/internal/application/model/table"
 	"ai-software-copyright-server/internal/application/param/request"
-	"ai-software-copyright-server/internal/application/param/response"
 	mailPlugin "ai-software-copyright-server/internal/application/plugin/mail"
 	"ai-software-copyright-server/internal/application/service"
 	"ai-software-copyright-server/internal/global"
-	"ai-software-copyright-server/internal/utils"
 	"github.com/pkg/errors"
-	"golang.org/x/crypto/bcrypt"
 	"sync"
 	"xorm.io/xorm"
 )
@@ -47,77 +44,77 @@ func (s *UserService) SendMail(userId int64, title, content string) error {
 	})
 }
 
-func (s *UserService) UpdateUserInfo(userId int64, param request.UserInfoParam) (*response.UserRewardResponse, error) {
-	mod, err := s.GetById(userId)
-	if err != nil {
-		return nil, err
-	}
-	updateMod := &table.User{}
-	first := false
-	if param.Phone != "" {
-		if mod.Phone == nil {
-			first = true
-			if mod.Password == "" && param.Password == "" {
-				param.Password = param.Phone[len(param.Phone)-8 : len(param.Phone)]
-			}
-		}
-		if mod.Phone == nil || *mod.Phone != param.Phone {
-			exist, err := s.Db.Get(&table.User{Phone: &param.Phone})
-			if err != nil {
-				return nil, err
-			}
-			if exist {
-				return nil, errors.New("该手机号已绑定其他账号")
-			}
-			updateMod.Phone = &param.Phone
-		}
-	}
-	if param.Email != "" {
-		if mod.Email == nil || *mod.Email != param.Email {
-			exist, err := s.Db.Get(&table.User{Email: &param.Email})
-			if err != nil {
-				return nil, err
-			}
-			if exist {
-				return nil, errors.New("该邮箱已绑定其他账号")
-			}
-			updateMod.Email = &param.Email
-		}
-	}
-	if param.Password != "" {
-		hashPwd, err := bcrypt.GenerateFromPassword(utils.Md5ByBytes(param.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return nil, err
-		}
-		updateMod.Password = string(hashPwd)
-	}
-
-	result := &response.UserRewardResponse{}
-
-	err = s.DbTransaction(func(session *xorm.Session) error {
-		_, err = session.ID(userId).Update(updateMod)
-		if err != nil {
-			return err
-		}
-		if first {
-			// 奖励自己
-			myRewardCredits := table.CreditsChange{
-				Type:          enum.CreditsChangeType(5),
-				ChangeCredits: 100,
-				Remark:        "首次维护个人信息，送100积分",
-			}
-			user, err := GetUserService().ChangeCreditsRunning(mod.Id, session, myRewardCredits)
-			if err != nil {
-				return err
-			}
-			result.Message = myRewardCredits.Remark
-			result.RewardCredits = myRewardCredits.ChangeCredits
-			result.BalanceCredits = user.Credits
-		}
-		return nil
-	})
-	return result, err
-}
+//func (s *UserService) UpdateUserInfo(userId int64, param request.UserInfoParam) (*response.UserRewardResponse, error) {
+//	mod, err := s.GetById(userId)
+//	if err != nil {
+//		return nil, err
+//	}
+//	updateMod := &table.User{}
+//	first := false
+//	if param.Phone != "" {
+//		if mod.Phone == nil {
+//			first = true
+//			if mod.Password == "" && param.Password == "" {
+//				param.Password = param.Phone[len(param.Phone)-8 : len(param.Phone)]
+//			}
+//		}
+//		if mod.Phone == nil || *mod.Phone != param.Phone {
+//			exist, err := s.Db.Get(&table.User{Phone: &param.Phone})
+//			if err != nil {
+//				return nil, err
+//			}
+//			if exist {
+//				return nil, errors.New("该手机号已绑定其他账号")
+//			}
+//			updateMod.Phone = &param.Phone
+//		}
+//	}
+//	if param.Email != "" {
+//		if mod.Email == nil || *mod.Email != param.Email {
+//			exist, err := s.Db.Get(&table.User{Email: &param.Email})
+//			if err != nil {
+//				return nil, err
+//			}
+//			if exist {
+//				return nil, errors.New("该邮箱已绑定其他账号")
+//			}
+//			updateMod.Email = &param.Email
+//		}
+//	}
+//	if param.Password != "" {
+//		hashPwd, err := bcrypt.GenerateFromPassword(utils.Md5ByBytes(param.Password), bcrypt.DefaultCost)
+//		if err != nil {
+//			return nil, err
+//		}
+//		updateMod.Password = string(hashPwd)
+//	}
+//
+//	result := &response.UserRewardResponse{}
+//
+//	err = s.DbTransaction(func(session *xorm.Session) error {
+//		_, err = session.ID(userId).Update(updateMod)
+//		if err != nil {
+//			return err
+//		}
+//		if first {
+//			// 奖励自己
+//			myRewardCredits := table.CreditsChange{
+//				Type:          enum.CreditsChangeType(5),
+//				ChangeCredits: 100,
+//				Remark:        "首次维护个人信息，送100积分",
+//			}
+//			user, err := GetUserService().ChangeCreditsRunning(mod.Id, session, myRewardCredits)
+//			if err != nil {
+//				return err
+//			}
+//			result.Message = myRewardCredits.Remark
+//			result.RewardCredits = myRewardCredits.ChangeCredits
+//			result.BalanceCredits = user.Credits
+//		}
+//		return nil
+//	})
+//	return result, err
+//}
 
 // 购物减少积分
 func (s *UserService) PaymentCredits(userId int64, typ enum.BuyType, expenseCredits int, remark string) (*table.User, error) {
