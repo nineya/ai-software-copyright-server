@@ -110,6 +110,7 @@ func initApiRouter(router *gin.Engine) {
 	{
 		userRouterGroup.Cdkey.InitCdkeyApiRouter(userPrivateGroup)
 		userRouterGroup.Credits.InitCreditsOrderApiRouter(userPrivateGroup)
+		userRouterGroup.SoftwareCopyright.InitDownloadApiRouter(userPrivateGroup)
 		userRouterGroup.SoftwareCopyright.InitSoftwareCopyrightApiRouter(userPrivateGroup)
 		userRouterGroup.Study.InitResourceApiRouter(userPrivateGroup)
 		userRouterGroup.User.InitAuthApiRouter(userPrivateGroup)

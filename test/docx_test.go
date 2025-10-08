@@ -17,12 +17,17 @@ import (
 func TestContainer(t *testing.T) {
 	initialize.InitSystemConfig()
 	initialize.InitLogger()
+	t.Run("ZipFile", ZipFile)
 	//t.Run("RequestFile", RequestFile)
-	t.Run("TitleFile", TitleFile)
+	//t.Run("TitleFile", TitleFile)
 	//t.Run("ImageFile", ImageFile)
 	//t.Run("BookFile", BookFile)
 	//t.Run("CodeFile", CodeFile)
 	//t.Run("CodeTemplate", CodeTemplate)
+}
+
+func ZipFile(t *testing.T) {
+	utils.CreateZip("../data/software_copyright/29/demo", "../data/software_copyright/29/demo.zip")
 }
 
 func RequestFile(t *testing.T) {

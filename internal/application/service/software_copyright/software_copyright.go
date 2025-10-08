@@ -107,6 +107,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	// 创建目录
 	storePath := utils.GetSoftwareCopyrightPath(sc.Id)
 	demoPath := storePath + "/demo"
+	demoFile := storePath + "/demo.zip"
 	if err = os.MkdirAll(demoPath, 0755); err != nil {
 		global.LOG.Error(fmt.Sprintf("创建软著会话目录失败：%+v", err))
 		return
@@ -642,6 +643,12 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	err = bookDoc.Save(storePath + "/文档鉴别材料.docx")
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("生成文档鉴别材料失败：%+v", err))
+		return
+	}
+	// 保存demo压缩包
+	err = utils.CreateZip(demoPath, demoFile)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("创建demo压缩包失败：%+v", err))
 	}
 }
 

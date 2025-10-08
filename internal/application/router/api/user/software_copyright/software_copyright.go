@@ -67,6 +67,10 @@ func (m *SoftwareCopyrightApiRouter) GetById(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
+	if mod.Id == 0 {
+		response.FailWithMessage("软著申请不存在", c)
+		return
+	}
 	response.OkWithData(mod, c)
 }
 

@@ -19,7 +19,7 @@ var (
 	tBuildTime     = "1705399795000"
 	BuildTime, _   = strconv.ParseInt(tBuildTime, 10, 64)
 	BuildGoVersion = runtime.Version()
-	Host           = "http://127.0.0.1:8889"
+	Host           = "http://127.0.0.1:9300"
 	BotReg, _      = regexp.Compile("(okhttp|Go-http-client|python-requests|spider|bot)")
 	AesKey         = []byte("6c088f40caea4e4bb9bd5403d7134783")
 )

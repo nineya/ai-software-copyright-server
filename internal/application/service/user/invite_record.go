@@ -23,8 +23,14 @@ func GetInviteRecordService() *InviteRecordService {
 	return inviteRecordService
 }
 
+func (s *InviteRecordService) GetAll(userId int64) ([]table.InviteRecord, error) {
+	list := make([]table.InviteRecord, 0)
+	err := s.WhereUserSession(userId).Desc("create_time").Find(&list)
+	return list, err
+}
+
 func (s *InviteRecordService) Statistic(userId int64) (*table.InviteStatistic, error) {
 	mod := &table.InviteStatistic{}
-	_, err := s.WhereUserSession(userId).Select("COUNT(*) AS total_count, sum(CASE WHEN type = 1 THEN reward_coin END) AS invite_credits, count(CASE WHEN type = 1 and create_time >= DATE_SUB(NOW(), INTERVAL 1 MONTH) THEN 1 END) AS month_count").Get(mod)
+	_, err := s.WhereUserSession(userId).Select("COUNT(*) AS total_count, sum(CASE WHEN type = 1 THEN reward_credits END) AS invite_credits, count(CASE WHEN type = 1 and create_time >= DATE_SUB(NOW(), INTERVAL 1 MONTH) THEN 1 END) AS month_count").Get(mod)
 	return mod, err
 }

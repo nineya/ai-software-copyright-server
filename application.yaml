@@ -1,9 +1,9 @@
 server:
-  port: 8868
+  port: 9300
   # 运行模式，dev/prod
   mode: dev
   # 缓存模式，memory/redis
-  cache: memory
+  cache: redis
 datasource:
   type: mysql
   url: test:123456@tcp(test.nineya.com:3306)/test_ai_software_copyright?charset=utf8mb4&parseTime=True&loc=Local
@@ -14,7 +14,7 @@ datasource:
   cache-size: 1000
   show-sql: true
 redis:
-  db: 8889
+  db: 2
   host: 'test.nineya.com:6379'
   password: '361654768'
 jwt:

@@ -109,6 +109,73 @@ func WriteFile(bytes []byte, dstDir, dstFile string) error {
 	return nil
 }
 
+func CreateZip(path, zipFile string) error {
+	// 创建zip文件
+	zipFileWriter, err := os.Create(zipFile)
+	if err != nil {
+		return err
+	}
+	defer zipFileWriter.Close()
+
+	// 创建zip writer
+	zipWriter := zip.NewWriter(zipFileWriter)
+	defer zipWriter.Close()
+
+	// 获取文件绝对路径
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return err
+	}
+
+	return filepath.Walk(absPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// 创建zip文件中的文件头
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		// 设置文件头中的文件名（相对路径）
+		relPath, err := filepath.Rel(absPath, path)
+		if err != nil {
+			return err
+		}
+		header.Name = relPath
+
+		// 如果是目录，需要在文件名后加斜杠
+		if info.IsDir() {
+			header.Name += "/"
+		} else {
+			// 设置压缩方法
+			header.Method = zip.Deflate
+		}
+
+		// 创建zip文件中的文件
+		writer, err := zipWriter.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		// 如果是文件，写入文件内容
+		if !info.IsDir() {
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			_, err = io.Copy(writer, file)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
 func UnZip(zipFile, dstPath string) error {
 	archive, err := zip.OpenReader(zipFile)
 	if err != nil {

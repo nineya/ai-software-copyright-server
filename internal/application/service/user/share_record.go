@@ -26,6 +26,25 @@ func GetShareRecordService() *ShareRecordService {
 	return shareRecordService
 }
 
+func (s *ShareRecordService) Create(userId int64, param table.ShareRecord) error {
+	return s.DbTransaction(func(session *xorm.Session) error {
+		exist, err := s.AddWhereUser(userId, session).Get(&table.ShareRecord{ShareUrl: param.ShareUrl})
+		if err != nil {
+			return errors.Wrap(err, "查询分享链接信息失败")
+		}
+		if exist {
+			return errors.New("该分享链接已提交")
+		}
+		_, err = session.Insert(&table.ShareRecord{
+			UserId:        userId,
+			ShareUrl:      param.ShareUrl,
+			RewardCredits: param.RewardCredits,
+			Status:        enum.ShareStatus(1),
+		})
+		return err
+	})
+}
+
 // 审核分享
 func (s *ShareRecordService) Audit(param table.ShareRecord) (*table.ShareRecord, error) {
 	mod := &table.ShareRecord{}
@@ -40,7 +59,7 @@ func (s *ShareRecordService) Audit(param table.ShareRecord) (*table.ShareRecord,
 	mod.Remark = param.Remark
 	err = s.DbTransaction(func(session *xorm.Session) error {
 		// 审核通过，需要奖励分享的用户
-		if param.Status == enum.ShareStatus(2) || param.RewardCredits > 0 {
+		if param.Status == enum.ShareStatus(2) && param.RewardCredits > 0 {
 			mod.RewardCredits = param.RewardCredits
 			rewardCredits := table.CreditsChange{
 				Type:          enum.CreditsChangeType(2),
@@ -60,8 +79,14 @@ func (s *ShareRecordService) Audit(param table.ShareRecord) (*table.ShareRecord,
 	return mod, err
 }
 
+func (s *ShareRecordService) GetAll(userId int64) ([]table.ShareRecord, error) {
+	list := make([]table.ShareRecord, 0)
+	err := s.WhereUserSession(userId).Desc("create_time").Find(&list)
+	return list, err
+}
+
 func (s *ShareRecordService) Statistic(userId int64) (*table.ShareStatistic, error) {
 	mod := &table.ShareStatistic{}
-	_, err := s.WhereUserSession(userId).Select("sum(reward_credits) AS share_credits, count(CASE WHEN status = 1 THEN 1 END) AS await_count, count(CASE WHEN status = 2 THEN 1 END) AS pass_count").Get(mod)
+	_, err := s.WhereUserSession(userId).Select("sum(CASE WHEN status = 2 THEN reward_credits END) AS share_credits, count(CASE WHEN status = 1 THEN 1 END) AS await_count, count(CASE WHEN status = 2 THEN 1 END) AS pass_count").Get(mod)
 	return mod, err
 }
