@@ -10,6 +10,7 @@ import (
 	"github.com/ZeroHawkeye/wordZero/pkg/style"
 	"log"
 	"math"
+	"strings"
 	"testing"
 	"time"
 )
@@ -17,12 +18,12 @@ import (
 func TestContainer(t *testing.T) {
 	initialize.InitSystemConfig()
 	initialize.InitLogger()
-	t.Run("ZipFile", ZipFile)
+	//t.Run("ZipFile", ZipFile)
 	//t.Run("RequestFile", RequestFile)
 	//t.Run("TitleFile", TitleFile)
 	//t.Run("ImageFile", ImageFile)
 	//t.Run("BookFile", BookFile)
-	//t.Run("CodeFile", CodeFile)
+	t.Run("CodeFile", CodeFile)
 	//t.Run("CodeTemplate", CodeTemplate)
 }
 
@@ -385,9 +386,10 @@ func BookFile(t *testing.T) {
 }
 
 func CodeFile(t *testing.T) {
+	codeText := "package com.linssw.panassist;\nimport org.springframework.boot.SpringApplication;\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\n/**\n * 网盘拉新达人助手小程序软件 - 主应用程序启动类\n *\n * 软件全称： 网盘拉新达人助手小程序软件\n * 软件简称： 网盘拉新达人助手\n * 软件分类： 小程序\n * 作者： 林松望\n *\n * 这是一个基于Spring Boot的后端基础运行框架，旨在提供一个现代、可扩展的起点，\n * 用于开发“网盘拉新达人助手”的各项功能。\n */\n@SpringBootApplication\npublic class PanAssistApplication {\n    public static void main(String[] args) {\n        SpringApplication.run(PanAssistApplication.class, args);\n    }\n}\npackage com.linssw.panassist.config;\nimport io.swagger.v3.oas.models.OpenAPI;\nimport io.swagger.v3.oas.models.info.Info;\nimport io.swagger.v3.oas.models.info.License;\nimport org.springframework.context.annotation.Bean;\nimport org.springframework.context.annotation.Configuration;\n/**\n * OpenAPI (Swagger UI) 配置\n * 访问地址: http://localhost:8080/swagger-ui.html\n */\n@Configuration\npublic class OpenApiConfig {\n    @Bean\n    public OpenAPI customOpenAPI() {\n        return new OpenAPI()\n                .info(new Info()\n                        .title(\"网盘拉新达人助手 API\")\n                        .version(\"1.0\")\n                        .description(\"网盘拉新达人助手小程序软件的后端API文档\")\n                        .termsOfService(\"http://swagger.io/terms/\")\n                        .license(new License().name(\"Apache 2.0\").url(\"http://springdoc.org\")));\n    }\n}\npackage com.linssw.panassist.config;\nimport org.springframework.context.annotation.Bean;\nimport org.springframework.context.annotation.Configuration;\nimport org.springframework.security.config.annotation.web.builders.HttpSecurity;\nimport org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;\nimport org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;\nimport org.springframework.security.web.SecurityFilterChain;\n/**\n * Spring Security 配置\n * 这是一个基础配置，允许对所有API端点进行未经认证的访问，\n * 以便快速启动和开发。在生产环境中，需要更严格的认证和授权策略。\n */\n@Configuration\n@EnableWebSecurity\npublic class SecurityConfig {\n    @Bean\n    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {\n        http\n            .csrf(AbstractHttpConfigurer::disable) // 禁用CSRF，通常REST API不需要\n            .authorizeHttpRequests(authorize -> authorize\n                .requestMatchers(\"/api/**\", \"/swagger-ui.html\", \"/swagger-ui/**\", \"/v3/api-docs/**\").permitAll() // 允许所有API和Swagger访问\n                .anyRequest().authenticated() // 其他所有请求需要认证\n            );\n        // 如果需要启用表单登录，可以添加 .formLogin()\n        // 如果需要启用HTTP Basic认证，可以添加 .httpBasic()\n        return http.build();\n    }\n}\npackage com.linssw.panassist.exception;\nimport com.linssw.panassist.dto.ErrorResponse;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.web.bind.MethodArgumentNotValidException;\nimport org.springframework.web.bind.annotation.ControllerAdvice;\nimport org.springframework.web.bind.annotation.ExceptionHandler;\nimport org.springframework.web.bind.annotation.ResponseStatus;\nimport java.time.LocalDateTime;\nimport java.util.List;\nimport java.util.stream.Collectors;\n/**"
 	// 创建新文档
 	doc := document.New()
-	doc.SetPageMargins(25, 25, 20, 25)
+	doc.SetPageMargins(20, 25, 20, 25)
 	fmt.Println(doc.SetDocGrid(document.DocGridDefault, 5, 40))
 	// 添加页眉
 	doc.AddHeader(document.HeaderFooterTypeDefault, "文档标题 - WordZero演示")
@@ -395,8 +397,9 @@ func CodeFile(t *testing.T) {
 	doc.AddFooterWithPageNumber(document.HeaderFooterTypeDefault, "", true)
 
 	// 添加正文段落
-	doc.AddFormattedParagraph(".ColorUtil.fromDartColor(Colors.grey", &document.TextFormat{FontFamily: "宋体", FontSize: 11})
-	doc.AddFormattedParagraph(".ColorUtil.fromDartColor(Colors.grey", &document.TextFormat{FontFamily: "宋体", FontSize: 11})
+	for _, line := range strings.Split(codeText, "\n") {
+		doc.AddFormattedParagraph(line, &document.TextFormat{FontFamily: "宋体", FontSize: 11})
+	}
 
 	// 保存文档
 	if err := doc.Save("example.docx"); err != nil {
