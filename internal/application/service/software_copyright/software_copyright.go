@@ -18,7 +18,6 @@ import (
 	"github.com/ZeroHawkeye/wordZero/pkg/markdown"
 	"github.com/ZeroHawkeye/wordZero/pkg/style"
 	"github.com/chromedp/chromedp"
-	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -320,7 +319,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	// 添加正文段落
 	codeContentStyle := &document.TextFormat{FontFamily: "宋体", FontSize: 11}
 	for _, line := range codeLines {
-		if line == "" || strings.HasPrefix(line, "```") || strings.HasPrefix(line, "//") || strings.HasPrefix(line, "# ") {
+		if line == "" || strings.Contains(line, "```") || strings.HasPrefix(line, "//") || strings.HasPrefix(line, "# ") {
 			continue
 		}
 		codeDoc.AddFormattedParagraph(line, codeContentStyle)
@@ -579,23 +578,24 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 %s
 `, item.Name, item.Desc, item.Operation, htmlContent)
 		param.Inputs["mode"] = "demo"
-		htmlResult, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
+		htmlContent, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
 		if err != nil {
 			global.LOG.Error(fmt.Sprintf("生成用户手册%s的demo失败：%+v", item.Name, err))
 		} else {
-			htmlContent = htmlResult
+			htmlPath := demoPath + "/" + item.Name + ".html"
 			// 将字符串写入文件，如果文件不存在会创建，存在则覆盖
-			err = os.WriteFile(demoPath+"/"+item.Name+".html", []byte(htmlContent), 0644)
+			err = os.WriteFile(htmlPath, []byte(htmlContent), 0644)
 			if err != nil {
-				log.Fatal("写入文件失败:", err)
+				global.LOG.Error(fmt.Sprintf("用户手册%s的demo写入文件失败：%+v", item.Name, err))
 			}
 			var imageBytes []byte
 			err = chromedp.Run(chromeCtx,
 				// 设置视口
 				chromedp.EmulateViewport(width, height),
 				// 设置内容
-				chromedp.Navigate("data:text/html;charset=utf-8;base64,"+
-					base64.StdEncoding.EncodeToString([]byte(htmlContent))),
+				chromedp.Navigate("file://"+htmlPath),
+				//chromedp.Navigate("data:text/html;charset=utf-8;base64,"+
+				//	base64.StdEncoding.EncodeToString([]byte(htmlContent))),
 				// 等待页面加载完成
 				chromedp.WaitReady("body"),
 				// 等待 JavaScript 执行
