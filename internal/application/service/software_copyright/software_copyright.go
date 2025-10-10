@@ -220,7 +220,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		{"开发方式", "单独开发", "选“单独开发”就可以，其他选项需要增加相关的协议"},
 		{"开发完成日期", sc.CreateTime.Format("2006-01-02")},
 		{"发表状态", "未发表", "选“未发表”即可，选择已发表需要填写首次发表日期和地点"},
-		{"著作权人", "", "系统自动带出，不可修改"},
+		{"著作权人", sc.Owner, "系统自动带出，不可修改"},
 	}
 	addTableIntoDoc(devData, requestDoc)
 	// 软件功能与特点
@@ -579,7 +579,7 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 `, item.Name, item.Desc, item.Operation, htmlContent)
 		param.Inputs["mode"] = "demo"
 		htmlContent, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(s.ApiKey, param)
-		if err != nil {
+		if err != nil || strings.TrimSpace(htmlContent) == "" {
 			global.LOG.Error(fmt.Sprintf("生成用户手册%s的demo失败：%+v", item.Name, err))
 		} else {
 			htmlPath := demoPath + "/" + item.Name + ".html"
@@ -645,7 +645,8 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 		global.LOG.Error(fmt.Sprintf("生成文档鉴别材料失败：%+v", err))
 		return
 	}
-	// 保存demo压缩包
+
+	// *保存demo压缩包
 	err = utils.CreateZip(demoPath, demoFile)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("创建demo压缩包失败：%+v", err))
