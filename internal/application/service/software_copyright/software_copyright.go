@@ -286,8 +286,8 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	funcData = append(funcData, []string{"面向领域/行业", requestInfo.Oriented, "按实际情况，可酌情修改"})
 	funcData = append(funcData, []string{"软件的主要功能", requestInfo.Function, "按实际情况，可酌情修改"})
 	funcData = append(funcData, []string{"软件的技术特点", requestInfo.Feature, "按实际情况，可酌情修改"})
-	funcData = append(funcData, []string{"程序鉴别材料", "一般交存", "选择一般交存，然后上传玖涯软著生成的pdf文件。也可以下载word文件，做微调后上传。"})
-	funcData = append(funcData, []string{"文档鉴别材料", "一般交存", "选择一般交存，然后上传玖涯软著生成的pdf文件。也可以下载word文件，做微调后上传。"})
+	funcData = append(funcData, []string{"程序鉴别材料", "一般交存", "选择一般交存，下载玖涯软著生成的word文件（可做微调），然后转换为pdf上传。"})
+	funcData = append(funcData, []string{"文档鉴别材料", "一般交存", "选择一般交存，下载玖涯软著生成的word文件（可做微调），然后转换为pdf上传。"})
 	addTableIntoDoc(funcData, requestDoc)
 	// 保存文档
 	err = requestDoc.Save(storePath + "/著作权登记表.docx")
