@@ -677,9 +677,14 @@ func handleMarkdownToWord(bookStr string, converter *markdown.Converter, bookDoc
 	dd, _ := converter.ConvertString(bookStr, nil)
 	for _, element := range dd.Body.Elements {
 		if p, ok := element.(*document.Paragraph); ok {
-			if p.Properties != nil && p.Properties.ParagraphStyle != nil && p.Properties.ParagraphStyle.Val == style.StyleHeading2 {
-				bookDoc.AddHeadingParagraph(p.Runs[len(p.Runs)-1].Text.Content, 2)
-				continue
+			if p.Properties != nil && p.Properties.ParagraphStyle != nil {
+				if p.Properties.ParagraphStyle.Val == style.StyleHeading2 {
+					bookDoc.AddHeadingParagraph(p.Runs[len(p.Runs)-1].Text.Content, 2)
+					continue
+				} else if p.Properties.ParagraphStyle.Val == style.StyleHeading3 {
+					bookDoc.AddHeadingParagraph(p.Runs[len(p.Runs)-1].Text.Content, 3)
+					continue
+				}
 			}
 		}
 		bookDoc.Body.Elements = append(bookDoc.Body.Elements, element)
