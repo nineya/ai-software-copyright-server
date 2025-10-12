@@ -226,8 +226,8 @@ func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.Softw
 	// 软件功能与特点
 	requestDoc.AddHeadingParagraph("三、软件功能与特点", 1)
 	funcData := [][]string{{"字段", "填写内容", "说明"}}
-	funcData = append(funcData, []string{"开发的硬件环境", "Intel(R) Core(TM) i5-9400或同等性能CPU, 16GB DDR4内存, 512GB SSD"})
-	funcData = append(funcData, []string{"运行的硬件环境", "客户端：2核CPU, 4GB内存, 64GB存储；服务端：4核CPU, 8GB内存, 250GB SSD"})
+	funcData = append(funcData, []string{"开发的硬件环境", "Intel(R) Core i5-9400, 16GB DDR4内存, 512GB SSD"})
+	funcData = append(funcData, []string{"运行的硬件环境", "客户端：2核CPU, 4G内存, 64G存储；服务端：4核CPU, 8G内存, 64G SSD"})
 	funcData = append(funcData, []string{"开发该软件的操作系统", "Windows 11", "可以酌情修改"})
 	switch sc.CodeLang { // 根据源代码生成开发环境
 	case "Java":
