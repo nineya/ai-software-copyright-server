@@ -9,7 +9,7 @@ type SoftwareCopyright struct {
 	Id             int64                        `json:"id,omitempty" xorm:"<- PK AUTOINCR"` //主键
 	UserId         int64                        `json:"userId,omitempty" xorm:"notnull comment('用户id')" label:"用户id"`
 	Name           string                       `json:"name" xorm:"VARCHAR(50) notnull comment('软件全称')" binding:"required,lte=50" label:"软件全称"`
-	ShortName      string                       `json:"shortName" xorm:"VARCHAR(50) notnull comment('软件简称')" binding:"required,lte=50" label:"软件简称"`
+	ShortName      string                       `json:"shortName" xorm:"VARCHAR(50) notnull comment('软件简称')" binding:"lte=50" label:"软件简称"`
 	Version        string                       `json:"version" xorm:"VARCHAR(10) notnull comment('版本号')" binding:"lte=10" label:"版本号"`
 	Category       string                       `json:"category" xorm:"VARCHAR(20) notnull comment('软件分类')" binding:"lte=20" label:"软件分类"`
 	CodeLang       string                       `json:"codeLang" xorm:"VARCHAR(50) notnull comment('开发语言')" binding:"required,lte=50" label:"开发语言"`

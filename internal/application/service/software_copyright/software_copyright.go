@@ -84,6 +84,16 @@ func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopy
 	return result, err
 }
 
+// 触发重新生成任务
+func (s *SoftwareCopyrightService) TriggerGenerate(userId, id int64) error {
+	mod, err := s.GetById(userId, id)
+	if err != nil {
+		return err
+	}
+	go s.GenerateFileTask(userId, *mod)
+	return nil
+}
+
 // 创建文档任务
 func (s *SoftwareCopyrightService) GenerateFileTask(userId int64, sc table.SoftwareCopyright) {
 	var err error

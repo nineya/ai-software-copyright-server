@@ -86,6 +86,7 @@ func initApiRouter(router *gin.Engine) {
 		adminRouterGroup.Admin.InitAdminApiRouter(privateGroup)
 		adminRouterGroup.Admin.InitAuthApiRouter(privateGroup)
 		adminRouterGroup.Cdkey.InitCdkeyApiRouter(privateGroup)
+		adminRouterGroup.SoftwareCopyright.InitSoftwareCopyrightApiRouter(privateGroup)
 		adminRouterGroup.User.InitUserApiRouter(privateGroup)
 	}
 
