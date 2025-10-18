@@ -105,7 +105,8 @@ type PluginMail struct {
 }
 
 type PluginDify struct {
-	Host string `mapstructure:"host" json:"host" yaml:"host"`
+	Host              string   `mapstructure:"host" json:"host" yaml:"host"`
+	SoftwareCopyright []string `mapstructure:"software-copyright" json:"softwareCopyright" yaml:"software-copyright"`
 }
 
 type Plugin struct {

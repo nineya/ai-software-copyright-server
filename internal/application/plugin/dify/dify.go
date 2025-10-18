@@ -10,12 +10,10 @@ import (
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 )
 
 type DifyPlugin struct {
 	Client http.Client
-	mu     sync.Mutex
 }
 
 var onceDify = sync.Once{}
@@ -43,12 +41,6 @@ func (p *DifyPlugin) SendChat(apiKey string, param DifyChatMessageParam) (*DifyC
 }
 
 func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (string, string, error) {
-	p.mu.Lock()
-	defer func() {
-		time.Sleep(5 * time.Second)
-		p.mu.Unlock()
-	}()
-
 	param.ResponseMode = "streaming"
 
 	resultText := ""
@@ -73,12 +65,6 @@ func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (str
 }
 
 func (p *DifyPlugin) sendRequest(url, apiKey string, param any) ([]byte, error) {
-	p.mu.Lock()
-	defer func() {
-		time.Sleep(5 * time.Second)
-		p.mu.Unlock()
-	}()
-
 	var body io.Reader
 	if param != nil {
 		bytesData, _ := json.Marshal(param)

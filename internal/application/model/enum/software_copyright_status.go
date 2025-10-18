@@ -9,6 +9,7 @@ var SOFTWARE_COPYRIGHT_STATUS = [...]string{
 	"GENERATE", // 1,生成中
 	"COMPLETE", // 2,已完成
 	"FAILURE",  // 3,失败
+	"QUEUE",    // 4,排队中
 }
 
 type SoftwareCopyrightStatus uint

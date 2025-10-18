@@ -69,6 +69,8 @@ plugin:
     admin-mail: lsw@nineya.com
   dify:
     host: https://api.dify.ai/v1
+    software-copyright:
+      - app-kPGnBkdf9bSG850c5kgCS3SC
 logger:
   path: logs
   log-in-console: true
