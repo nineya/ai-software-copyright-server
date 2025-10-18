@@ -1,5 +1,11 @@
 package dify
 
+type DifyConversationRenameParam struct {
+	Name         string `json:"name,omitempty" label:"会话名称"`
+	AutoGenerate bool   `json:"auto_generate,omitempty" label:"自动生成标题"` // 默认 false
+	User         string `json:"user,omitempty" label:"用户标识"`
+}
+
 type DifyChatMessageParam struct {
 	Query            string                `json:"query" label:"用户输入/提问内容"`
 	Inputs           map[string]any        `json:"inputs,omitempty" label:"App 定义的各变量值"`

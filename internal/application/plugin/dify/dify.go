@@ -28,6 +28,17 @@ func GetDifyPlugin() *DifyPlugin {
 	return difyPlugin
 }
 
+func (p *DifyPlugin) ConversationRename(apiKey, conversationId string, param DifyConversationRenameParam) (*DifyConversationRenameResponse, error) {
+	content, err := p.sendRequest("/conversations/"+conversationId+"/name", apiKey, param)
+	if err != nil {
+		return nil, err
+	}
+
+	var result DifyConversationRenameResponse // 反序列化JSON到结构体
+	err = json.Unmarshal(content, &result)
+	return &result, err
+}
+
 func (p *DifyPlugin) SendChat(apiKey string, param DifyChatMessageParam) (*DifyChatMessageResponse, error) {
 	param.ResponseMode = "blocking"
 	content, err := p.sendRequest("/chat-messages", apiKey, param)
@@ -132,7 +143,7 @@ func (p *DifyPlugin) sendSSERequest(url, apiKey string, param any, event func(by
 		if !strings.HasPrefix(result, "data:") {
 			continue
 		}
-		global.LOG.Info("Dify SSE请求结果片段：", zap.String("url", url), zap.String("result", result))
+		//global.LOG.Debug("Dify SSE请求结果片段：", zap.String("url", url), zap.String("result", result))
 		err = event(result)
 		if err != nil {
 			global.LOG.Error("Dify SSE请求Event执行失败：", zap.String("url", url), zap.Any("result", result), zap.Error(err))

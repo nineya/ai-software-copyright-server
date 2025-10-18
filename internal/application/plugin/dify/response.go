@@ -1,5 +1,14 @@
 package dify
 
+type DifyConversationRenameResponse struct {
+	Id           string `json:"id"`           // 会话 ID
+	Name         string `json:"name"`         // 会话名称
+	Status       string `json:"status"`       // 会话状态
+	Introduction string `json:"introduction"` // 开场白
+	CreatedAt    int    `json:"created_at"`   // 消息创建时间戳
+	UpdatedAt    int    `json:"updated_at"`   // 消息更新时间戳
+}
+
 type DifyChatMessageResponse struct {
 	Event          string `json:"event"`           // 事件类型，固定为 message
 	TaskId         string `json:"task_id"`         // 任务 ID，用于请求跟踪和下方的停止响应接口
