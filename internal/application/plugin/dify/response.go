@@ -28,5 +28,6 @@ type DifyChatMessageSSEResponse struct {
 	ConversationId string `json:"conversation_id"` // 会话 ID
 	Mode           string `json:"mode"`            // App 模式，固定为 chat
 	Answer         string `json:"answer"`          // 完整回复内容
+	Message        string `json:"message"`         // 错误消息
 	CreatedAt      int    `json:"created_at"`      // 消息创建时间戳
 }

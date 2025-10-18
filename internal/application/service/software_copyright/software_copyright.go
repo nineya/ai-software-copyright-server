@@ -38,6 +38,7 @@ type SoftwareCopyrightTaskHandler struct {
 	ProgressCurrent int                                  //当前进度
 	ProgressCount   int                                  // 总进度
 	Requirements    []response.SCRequirementItemResponse // 需求列表
+	Wait            sync.WaitGroup                       // 用于控制并发，让主函数等待子函数
 	SC              *table.SoftwareCopyright
 }
 
@@ -183,8 +184,10 @@ func (s *SoftwareCopyrightService) ProcessGenerateTask(sc *table.SoftwareCopyrig
 }
 
 // 执行生成申请文件
-func (s *SoftwareCopyrightService) doGenerateRequestFile(handler *SoftwareCopyrightTaskHandler, param difyPlugin.DifyChatMessageParam, storePath string) {
+func (s *SoftwareCopyrightService) doGenerateRequestFile(handler *SoftwareCopyrightTaskHandler, storePath string) {
+	defer handler.Wait.Done()
 	sc := handler.SC
+	param := handleDifyParam("软著登记", "请帮我编写内容", sc)
 	// *生成申请文档
 	requestDoc := document.New()
 	requestDoc.GetStyleManager().AddStyle(&style.Style{
@@ -303,7 +306,6 @@ func (s *SoftwareCopyrightService) doGenerateRequestFile(handler *SoftwareCopyri
 	funcData = append(funcData, []string{"软件运行支撑环境/支持软件", "客户端：SQLite3；服务端：Nginx, MySQL, Redis", "可以酌情修改"})
 	funcData = append(funcData, []string{"编程语言", sc.CodeLang})
 	funcData = append(funcData, []string{"源程序量", strconv.Itoa(25000 + rand.Intn(10000))})
-	param.Inputs["mode"] = "软著登记"
 	requestStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]生成软著申请登记信息失败：%+v", sc.Id, err))
@@ -333,10 +335,11 @@ func (s *SoftwareCopyrightService) doGenerateRequestFile(handler *SoftwareCopyri
 }
 
 // 执行生成代码文件
-func (s *SoftwareCopyrightService) doGenerateCodeFile(handler *SoftwareCopyrightTaskHandler, param difyPlugin.DifyChatMessageParam, storePath string) {
+func (s *SoftwareCopyrightService) doGenerateCodeFile(handler *SoftwareCopyrightTaskHandler, storePath string) {
+	defer handler.Wait.Done()
 	sc := handler.SC
+	param := handleDifyParam("源代码", "请帮我编写内容", sc)
 	// *生成源代码
-	param.Inputs["mode"] = "源代码"
 	codeStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]生成软件源代码失败：%+v", sc.Id, err))
@@ -370,11 +373,12 @@ func (s *SoftwareCopyrightService) doGenerateCodeFile(handler *SoftwareCopyright
 }
 
 // 执行生成文档鉴别材料和demo
-func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCopyrightTaskHandler, param difyPlugin.DifyChatMessageParam, storePath, demoPath, demoFile string) {
+func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCopyrightTaskHandler, storePath, demoPath, demoFile string) {
+	defer handler.Wait.Done()
 	sc := handler.SC
+	param := handleDifyParam("用户手册", "请帮我编写内容", sc)
 
 	// *生成用户手册
-	param.Inputs["mode"] = "用户手册"
 	// 创建新文档
 	bookDoc := document.New()
 	// 添加页眉
@@ -735,21 +739,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	}
 
 	// 基础软著申请参数信息
-	param := difyPlugin.DifyChatMessageParam{
-		Query: "请帮我编写内容",
-		Inputs: map[string]any{
-			"name":        sc.Name,
-			"short_name":  sc.ShortName,
-			"version":     sc.Version,
-			"category":    sc.Category,
-			"code_lang":   sc.CodeLang,
-			"description": sc.Description,
-			"owner":       sc.Owner,
-			"mode":        "需求分析",
-		},
-		AutoGenerateName: false,
-		User:             fmt.Sprintf("%d-%d", sc.UserId, sc.Id),
-	}
+	param := handleDifyParam("需求分析", "请帮我编写内容", sc)
 
 	// *分析用户需求
 	requirementJson, conversationId, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
@@ -769,7 +759,10 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	sc.ApiKey = handler.ApiKey
 	sc.ConversationId = conversationId
 	handler.ProgressCount = 9 + (len(requirements) * 4)
+	handler.ProgressCurrent = 0
 	handler.Requirements = requirements
+	handler.Wait = sync.WaitGroup{}
+	handler.Wait.Add(3)
 	// 软著进度
 	err = handler.UpdateProgress(1+len(requirements), "软著用户需求分析")
 	if err != nil {
@@ -778,13 +771,16 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	}
 
 	// *生成申请文档
-	s.doGenerateRequestFile(handler, param, storePath)
+	go s.doGenerateRequestFile(handler, storePath)
 
 	// *生成源代码
-	s.doGenerateCodeFile(handler, param, storePath)
+	go s.doGenerateCodeFile(handler, storePath)
 
 	// *生成用户手册
-	s.doGenerateBookFileAndDemo(handler, param, storePath, demoPath, demoFile)
+	go s.doGenerateBookFileAndDemo(handler, storePath, demoPath, demoFile)
+
+	// 等待所有生成任务完成
+	handler.Wait.Wait()
 }
 
 // 后台分页查询列表
@@ -884,5 +880,25 @@ func addImageIntoWord(imageBytes []byte, bookDoc *document.Document) {
 	)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("插入图片到文档失败：%+v", err))
+	}
+}
+
+// 生成dify参数
+func handleDifyParam(mode, query string, sc *table.SoftwareCopyright) difyPlugin.DifyChatMessageParam {
+	return difyPlugin.DifyChatMessageParam{
+		Query: query,
+		Inputs: map[string]any{
+			"name":        sc.Name,
+			"short_name":  sc.ShortName,
+			"version":     sc.Version,
+			"category":    sc.Category,
+			"code_lang":   sc.CodeLang,
+			"description": sc.Description,
+			"owner":       sc.Owner,
+			"mode":        mode,
+		},
+		AutoGenerateName: false,
+		User:             fmt.Sprintf("%d-%d", sc.UserId, sc.Id),
+		ConversationId:   sc.ConversationId,
 	}
 }

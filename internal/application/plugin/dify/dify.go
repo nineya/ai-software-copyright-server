@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
@@ -64,8 +65,12 @@ func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (str
 		if err != nil {
 			return err
 		}
-		if result.Event == "message" {
+		switch result.Event {
+		case "message":
 			resultText += result.Answer
+		case "error": // 执行出错
+			global.LOG.Error("Dify SSE执行失败：", zap.String("result", content))
+			return errors.New(result.Message)
 		}
 		if conversationId == "" {
 			conversationId = result.ConversationId
