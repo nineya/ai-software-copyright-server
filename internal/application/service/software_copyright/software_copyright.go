@@ -31,9 +31,27 @@ import (
 )
 
 type SoftwareCopyrightTaskHandler struct {
-	ApiKey  string    // apikey
-	IsEnd   bool      //是否结束
-	EndTime time.Time // 上次结束试讲
+	sync.Mutex
+	ApiKey          string                               // apikey
+	IsEnd           bool                                 //是否结束
+	EndTime         time.Time                            // 上次结束时间
+	ProgressCurrent int                                  //当前进度
+	ProgressCount   int                                  // 总进度
+	Requirements    []response.SCRequirementItemResponse // 需求列表
+	SC              *table.SoftwareCopyright
+}
+
+// 更新生成进度
+func (h *SoftwareCopyrightTaskHandler) UpdateProgress(nextCount int, desc string) error {
+	h.Lock()
+	defer h.Unlock()
+
+	// 更新进度
+	h.ProgressCurrent += nextCount
+	h.SC.Progress = 100 * h.ProgressCurrent / h.ProgressCount
+	_, err := GetSoftwareCopyrightService().WhereUserSession(h.SC.UserId).ID(h.SC.Id).Update(h.SC)
+	global.LOG.Info(fmt.Sprintf("[%d]完成了%s，进度：%d", h.SC.Id, desc, h.SC.Progress))
+	return err
 }
 
 type SoftwareCopyrightService struct {
@@ -160,100 +178,13 @@ func (s *SoftwareCopyrightService) ProcessGenerateTask(sc *table.SoftwareCopyrig
 
 	// 执行任务
 	handler.IsEnd = false
-	go s.RunGenerateTask(handler, sc)
+	handler.SC = sc
+	go s.RunGenerateTask(handler)
 }
 
-// 创建文档任务
-func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTaskHandler, sc *table.SoftwareCopyright) {
-	var err error
-	defer func() {
-		if err != nil {
-			sc.Status = enum.SoftwareCopyrightStatus(3)
-			global.LOG.Error(fmt.Sprintf("[%d]软著申请材料生成失败：%+v", sc.Id, err))
-		} else if err := recover(); err != nil {
-			sc.Status = enum.SoftwareCopyrightStatus(3)
-			global.LOG.Error(fmt.Sprintf("[%d]软著申请材料生成失败：%+v", sc.Id, err))
-		} else {
-			sc.Progress = 100
-			sc.Status = enum.SoftwareCopyrightStatus(2)
-		}
-		_, err := s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-		if err != nil {
-			global.LOG.Error(fmt.Sprintf("[%d]更新软著申请状态失败：%+v", sc.Id, err))
-		}
-		global.LOG.Info(fmt.Sprintf("[%d]软著处理完成：%s", sc.Id, sc.Name))
-		// 加锁，避免并发执行
-		s.HandlerMutex.Lock()
-		handler.IsEnd = true
-		handler.EndTime = time.Now()
-		s.HandlerMutex.Unlock()
-		// 继续下一个软著的生成
-		s.ProcessGenerateTask(nil)
-	}()
-
-	global.LOG.Info(fmt.Sprintf("[%d]开始处理软著申请：%s", sc.Id, sc.Name))
-	// 创建目录
-	storePath := utils.GetSoftwareCopyrightPath(sc.Id)
-	demoPath := storePath + "/demo"
-	demoFile := storePath + "/demo.zip"
-	if err = os.MkdirAll(demoPath, 0755); err != nil {
-		global.LOG.Error(fmt.Sprintf("[%d]创建软著会话目录失败：%+v", sc.Id, err))
-		return
-	}
-
-	// 开始生成任务
-	sc.Progress = 1
-	sc.Status = enum.SoftwareCopyrightStatus(1)
-	_, err = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	if err != nil {
-		global.LOG.Error(fmt.Sprintf("[%d]开始软著生成任务失败：%+v", sc.Id, err))
-		return
-	}
-
-	// 基础软著信息
-	param := difyPlugin.DifyChatMessageParam{
-		Query: "请帮我编写内容",
-		Inputs: map[string]any{
-			"name":        sc.Name,
-			"short_name":  sc.ShortName,
-			"version":     sc.Version,
-			"category":    sc.Category,
-			"code_lang":   sc.CodeLang,
-			"description": sc.Description,
-			"owner":       sc.Owner,
-			"mode":        "需求分析",
-		},
-		AutoGenerateName: false,
-		User:             fmt.Sprintf("用户%d", sc.UserId),
-	}
-
-	// *分析用户需求
-	requirementJson, conversationId, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
-	if err != nil {
-		global.LOG.Error(fmt.Sprintf("[%d]分析用户需求失败：%+v", sc.Id, err))
-		return
-	}
-	requirements := make([]response.SCRequirementItemResponse, 0)
-	err = json.Unmarshal([]byte(requirementJson), &requirements)
-	if err != nil {
-		global.LOG.Error(fmt.Sprintf("[%d]用户需求结果解析失败：%+v", sc.Id, err))
-		return
-	}
-	_, _ = difyPlugin.GetDifyPlugin().ConversationRename(handler.ApiKey, conversationId, difyPlugin.DifyConversationRenameParam{Name: sc.Name, User: param.User})
-	sc.ConversationId = conversationId
-	param.ConversationId = conversationId
-	sc.ApiKey = handler.ApiKey
-	// 软著进度
-	progressCount := 8 + (len(requirements) * 4)
-	progressCurrent := 1 + len(requirements)
-	sc.Progress = 100 * progressCurrent / progressCount
-	_, err = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	global.LOG.Info(fmt.Sprintf("[%d]完成了软著用户需求分析，进度：%d", sc.Id, sc.Progress))
-	if err != nil {
-		global.LOG.Error(fmt.Sprintf("[%d]更新软著会话ID失败：%+v", sc.Id, err))
-		return
-	}
-
+// 执行生成申请文件
+func (s *SoftwareCopyrightService) doGenerateRequestFile(handler *SoftwareCopyrightTaskHandler, param difyPlugin.DifyChatMessageParam, storePath string) {
+	sc := handler.SC
 	// *生成申请文档
 	requestDoc := document.New()
 	requestDoc.GetStyleManager().AddStyle(&style.Style{
@@ -398,11 +329,12 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 		return
 	}
 	// 更新进度
-	progressCurrent += 1
-	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	global.LOG.Info(fmt.Sprintf("[%d]完成了软著申请文档编写，进度：%d", sc.Id, sc.Progress))
+	err = handler.UpdateProgress(1, "软著申请文档编写")
+}
 
+// 执行生成代码文件
+func (s *SoftwareCopyrightService) doGenerateCodeFile(handler *SoftwareCopyrightTaskHandler, param difyPlugin.DifyChatMessageParam, storePath string) {
+	sc := handler.SC
 	// *生成源代码
 	param.Inputs["mode"] = "源代码"
 	codeStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
@@ -434,10 +366,12 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 		return
 	}
 	// 更新进度
-	progressCurrent += 1 + len(requirements)
-	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	global.LOG.Info(fmt.Sprintf("[%d]完成了软著程序鉴别材料编写，进度：%d", sc.Id, sc.Progress))
+	_ = handler.UpdateProgress(1+len(handler.Requirements), "软著程序鉴别材料编写")
+}
+
+// 执行生成文档鉴别材料和demo
+func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCopyrightTaskHandler, param difyPlugin.DifyChatMessageParam, storePath, demoPath, demoFile string) {
+	sc := handler.SC
 
 	// *生成用户手册
 	param.Inputs["mode"] = "用户手册"
@@ -560,7 +494,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	coverStyle := &document.TextFormat{Bold: true, FontFamily: "宋体", FontSize: 26}
 	defaultSpacing := &document.SpacingConfig{LineSpacing: 1.5}
 	bookDoc.AddFormattedParagraph("\n", coverStyle)
-	paragraph = bookDoc.AddFormattedParagraph(sc.Name, coverStyle)
+	paragraph := bookDoc.AddFormattedParagraph(sc.Name, coverStyle)
 	paragraph.SetAlignment(document.AlignCenter)
 	paragraph.SetSpacing(defaultSpacing)
 	paragraph = bookDoc.AddFormattedParagraph(sc.Version, coverStyle)
@@ -595,10 +529,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	bookDoc.GenerateTOC(config)
 	converter := markdown.NewConverter(markdown.DefaultOptions())
 	// 更新进度
-	progressCurrent += 1
-	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料封面编写，进度：%d", sc.Id, sc.Progress))
+	_ = handler.UpdateProgress(1, "软著文档鉴别材料封面编写")
 	// 添加引言
 	bookDoc.AddHeadingParagraph("第一章 引言", 1)
 	param.Query = `请结合软件的功能和信息，帮我完成第一章引言的编写，要求包含编写目的、背景、目标用户等内容。
@@ -622,10 +553,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	}
 	handleMarkdownToWord(bookStr, converter, bookDoc)
 	// 更新进度
-	progressCurrent += 1
-	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料引言编写，进度：%d", sc.Id, sc.Progress))
+	_ = handler.UpdateProgress(1, "软著文档鉴别材料引言编写")
 
 	bookDoc.AddHeadingParagraph("第二章 软件概述", 1)
 	param.Query = `请结合软件的功能和信息，帮我完成软件概述章节的编写。容要丰富、有深度，可以分多段回答。
@@ -637,10 +565,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	}
 	handleMarkdownToWord(bookStr, converter, bookDoc)
 	// 更新进度
-	progressCurrent += 1
-	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料软件概述编写，进度：%d", sc.Id, sc.Progress))
+	_ = handler.UpdateProgress(1, "软著文档鉴别材料软件概述编写")
 
 	bookDoc.AddHeadingParagraph("第三章 软件运行的软硬件环境", 1)
 	param.Query = `请结合软件的功能和信息，帮我完成第三章软件运行的软硬件环境的编写，要求包含运行硬件环境、软件环境等内容，请从各个角度给出软硬件具体的版本、参数要求。
@@ -657,10 +582,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	}
 	handleMarkdownToWord(bookStr, converter, bookDoc)
 	// 更新进度
-	progressCurrent += 1
-	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料软件运行的软硬件环境编写，进度：%d", sc.Id, sc.Progress))
+	_ = handler.UpdateProgress(1, "软著文档鉴别材料软件运行的软硬件环境编写")
 
 	bookDoc.AddHeadingParagraph("第四章 主要功能与特点", 1)
 	htmlContent := ""
@@ -673,7 +595,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 创建chrome上下文
 	chromeCtx, chromeCancel := chromedp.NewContext(context.Background())
 	defer chromeCancel()
-	for i, item := range requirements {
+	for i, item := range handler.Requirements {
 		bookDoc.AddHeadingParagraph(fmt.Sprintf("4.%d %s", i+1, item.Name), 2)
 		// 生成demo代码
 		param.Query = fmt.Sprintf(`
@@ -722,10 +644,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 			}
 		}
 		// 更新进度
-		progressCurrent += 1
-		sc.Progress = 100 * progressCurrent / progressCount
-		_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-		global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料%s功能demo页面编写，进度：%d", sc.Id, item.Name, sc.Progress))
+		_ = handler.UpdateProgress(1, "软著文档鉴别材料"+item.Name+"功能demo页面编写")
 
 		bookDoc.AddHeadingParagraph(fmt.Sprintf("4.%d.1 功能介绍", i+1), 3)
 		handleMarkdownToWord(item.Desc, converter, bookDoc)
@@ -745,11 +664,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 			}
 		}
 		// 更新进度
-		progressCurrent += 1
-		sc.Progress = 100 * progressCurrent / progressCount
-		_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
-		global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料%s功能流程图编写，进度：%d", sc.Id, item.Name, sc.Progress))
-		//bookDoc.AddFormattedParagraph("操作说明：", &document.TextFormat{Bold: true})
+		_ = handler.UpdateProgress(1, "软著文档鉴别材料"+item.Name+"功能流程图生成")
 		handleMarkdownToWord(item.Operation, converter, bookDoc)
 	}
 	bookDoc.UpdateTOC(config)
@@ -768,6 +683,108 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 		return
 	}
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著demo压缩包保存，进度：%d", sc.Id, sc.Progress))
+	_ = handler.UpdateProgress(1, "软著文档鉴别材料和demo处理完成")
+}
+
+// 创建文档任务
+func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTaskHandler) {
+	sc := handler.SC
+	var err error
+	defer func() {
+		if err != nil {
+			sc.Status = enum.SoftwareCopyrightStatus(3)
+			global.LOG.Error(fmt.Sprintf("[%d]软著申请材料生成失败：%+v", sc.Id, err))
+		} else if err := recover(); err != nil {
+			sc.Status = enum.SoftwareCopyrightStatus(3)
+			global.LOG.Error(fmt.Sprintf("[%d]软著申请材料生成失败：%+v", sc.Id, err))
+		} else {
+			sc.Progress = 100
+			sc.Status = enum.SoftwareCopyrightStatus(2)
+		}
+		_, err := s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
+		if err != nil {
+			global.LOG.Error(fmt.Sprintf("[%d]更新软著申请状态失败：%+v", sc.Id, err))
+		}
+		global.LOG.Info(fmt.Sprintf("[%d]软著处理完成：%s", sc.Id, sc.Name))
+		// 加锁，避免并发执行
+		s.HandlerMutex.Lock()
+		handler.IsEnd = true
+		handler.EndTime = time.Now()
+		s.HandlerMutex.Unlock()
+		// 继续下一个软著的生成
+		s.ProcessGenerateTask(nil)
+	}()
+
+	global.LOG.Info(fmt.Sprintf("[%d]开始处理软著申请：%s", sc.Id, sc.Name))
+	// 创建目录
+	storePath := utils.GetSoftwareCopyrightPath(sc.Id)
+	demoPath := storePath + "/demo"
+	demoFile := storePath + "/demo.zip"
+	if err = os.MkdirAll(demoPath, 0755); err != nil {
+		global.LOG.Error(fmt.Sprintf("[%d]创建软著会话目录失败：%+v", sc.Id, err))
+		return
+	}
+
+	// 开始生成任务
+	sc.Progress = 1
+	sc.Status = enum.SoftwareCopyrightStatus(1)
+	_, err = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("[%d]开始软著生成任务失败：%+v", sc.Id, err))
+		return
+	}
+
+	// 基础软著申请参数信息
+	param := difyPlugin.DifyChatMessageParam{
+		Query: "请帮我编写内容",
+		Inputs: map[string]any{
+			"name":        sc.Name,
+			"short_name":  sc.ShortName,
+			"version":     sc.Version,
+			"category":    sc.Category,
+			"code_lang":   sc.CodeLang,
+			"description": sc.Description,
+			"owner":       sc.Owner,
+			"mode":        "需求分析",
+		},
+		AutoGenerateName: false,
+		User:             fmt.Sprintf("%d-%d", sc.UserId, sc.Id),
+	}
+
+	// *分析用户需求
+	requirementJson, conversationId, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("[%d]分析用户需求失败：%+v", sc.Id, err))
+		return
+	}
+	requirements := make([]response.SCRequirementItemResponse, 0)
+	err = json.Unmarshal([]byte(requirementJson), &requirements)
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("[%d]用户需求结果解析失败：%+v", sc.Id, err))
+		return
+	}
+	// 更新会话名字
+	_, _ = difyPlugin.GetDifyPlugin().ConversationRename(handler.ApiKey, conversationId, difyPlugin.DifyConversationRenameParam{Name: sc.Name, User: param.User})
+	param.ConversationId = conversationId
+	sc.ApiKey = handler.ApiKey
+	sc.ConversationId = conversationId
+	handler.ProgressCount = 9 + (len(requirements) * 4)
+	handler.Requirements = requirements
+	// 软著进度
+	err = handler.UpdateProgress(1+len(requirements), "软著用户需求分析")
+	if err != nil {
+		global.LOG.Error(fmt.Sprintf("[%d]更新软著会话ID失败：%+v", sc.Id, err))
+		return
+	}
+
+	// *生成申请文档
+	s.doGenerateRequestFile(handler, param, storePath)
+
+	// *生成源代码
+	s.doGenerateCodeFile(handler, param, storePath)
+
+	// *生成用户手册
+	s.doGenerateBookFileAndDemo(handler, param, storePath, demoPath, demoFile)
 }
 
 // 后台分页查询列表
