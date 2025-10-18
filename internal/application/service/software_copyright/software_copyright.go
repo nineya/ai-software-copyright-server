@@ -59,7 +59,7 @@ func GetSoftwareCopyrightService() *SoftwareCopyrightService {
 }
 
 func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopyright) (*response.UserBuyResponse, error) {
-	if matched, _ := regexp.MatchString(`^[V]*(0|[1-9]\d*)(\.(0|[1-9]\d*))+$`, param.ApiKey); !matched {
+	if matched, _ := regexp.MatchString(`^V*(0|[1-9]\d*)(\.(0|[1-9]\d*))+$`, param.Version); !matched {
 		return nil, errors.New("版本号请严格按照V1.0或1.0格式")
 	}
 
@@ -177,7 +177,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 			sc.Progress = 100
 			sc.Status = enum.SoftwareCopyrightStatus(2)
 		}
-		_, err := s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+		_, err := s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 		if err != nil {
 			global.LOG.Error(fmt.Sprintf("[%d]更新软著申请状态失败：%+v", sc.Id, err))
 		}
@@ -204,7 +204,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 开始生成任务
 	sc.Progress = 1
 	sc.Status = enum.SoftwareCopyrightStatus(1)
-	_, err = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, err = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]开始软著生成任务失败：%+v", sc.Id, err))
 		return
@@ -239,7 +239,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 		global.LOG.Error(fmt.Sprintf("[%d]用户需求结果解析失败：%+v", sc.Id, err))
 		return
 	}
-	_, _ = difyPlugin.GetDifyPlugin().ConversationRename(handler.ApiKey, conversationId, difyPlugin.DifyConversationRenameParam{Name: sc.Name})
+	_, _ = difyPlugin.GetDifyPlugin().ConversationRename(handler.ApiKey, conversationId, difyPlugin.DifyConversationRenameParam{Name: sc.Name, User: param.User})
 	sc.ConversationId = conversationId
 	param.ConversationId = conversationId
 	sc.ApiKey = handler.ApiKey
@@ -247,7 +247,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	progressCount := 8 + (len(requirements) * 4)
 	progressCurrent := 1 + len(requirements)
 	sc.Progress = 100 * progressCurrent / progressCount
-	_, err = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, err = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著用户需求分析，进度：%d", sc.Id, sc.Progress))
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]更新软著会话ID失败：%+v", sc.Id, err))
@@ -400,7 +400,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 更新进度
 	progressCurrent += 1
 	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著申请文档编写，进度：%d", sc.Id, sc.Progress))
 
 	// *生成源代码
@@ -436,7 +436,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 更新进度
 	progressCurrent += 1 + len(requirements)
 	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著程序鉴别材料编写，进度：%d", sc.Id, sc.Progress))
 
 	// *生成用户手册
@@ -597,7 +597,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 更新进度
 	progressCurrent += 1
 	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料封面编写，进度：%d", sc.Id, sc.Progress))
 	// 添加引言
 	bookDoc.AddHeadingParagraph("第一章 引言", 1)
@@ -624,7 +624,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 更新进度
 	progressCurrent += 1
 	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料引言编写，进度：%d", sc.Id, sc.Progress))
 
 	bookDoc.AddHeadingParagraph("第二章 软件概述", 1)
@@ -639,7 +639,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 更新进度
 	progressCurrent += 1
 	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料软件概述编写，进度：%d", sc.Id, sc.Progress))
 
 	bookDoc.AddHeadingParagraph("第三章 软件运行的软硬件环境", 1)
@@ -659,7 +659,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	// 更新进度
 	progressCurrent += 1
 	sc.Progress = 100 * progressCurrent / progressCount
-	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+	_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 	global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料软件运行的软硬件环境编写，进度：%d", sc.Id, sc.Progress))
 
 	bookDoc.AddHeadingParagraph("第四章 主要功能与特点", 1)
@@ -724,7 +724,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 		// 更新进度
 		progressCurrent += 1
 		sc.Progress = 100 * progressCurrent / progressCount
-		_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+		_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 		global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料%s功能demo页面编写，进度：%d", sc.Id, item.Name, sc.Progress))
 
 		bookDoc.AddHeadingParagraph(fmt.Sprintf("4.%d.1 功能介绍", i+1), 3)
@@ -747,7 +747,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 		// 更新进度
 		progressCurrent += 1
 		sc.Progress = 100 * progressCurrent / progressCount
-		_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(&sc)
+		_, _ = s.WhereUserSession(sc.UserId).ID(sc.Id).Update(sc)
 		global.LOG.Info(fmt.Sprintf("[%d]完成了软著文档鉴别材料%s功能流程图编写，进度：%d", sc.Id, item.Name, sc.Progress))
 		//bookDoc.AddFormattedParagraph("操作说明：", &document.TextFormat{Bold: true})
 		handleMarkdownToWord(item.Operation, converter, bookDoc)
