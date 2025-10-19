@@ -1,7 +1,7 @@
 package software_copyright
 
 import (
-	"ai-software-copyright-server/internal/application/model/table"
+	"ai-software-copyright-server/internal/application/param/request"
 	"ai-software-copyright-server/internal/application/param/response"
 	"ai-software-copyright-server/internal/application/router/api"
 	scSev "ai-software-copyright-server/internal/application/service/software_copyright"
@@ -28,18 +28,18 @@ func (m *SoftwareCopyrightApiRouter) InitSoftwareCopyrightApiRouter(Router *gin.
 // @security user
 // @router /softwareCopyright [post]
 func (m *SoftwareCopyrightApiRouter) Trigger(c *gin.Context) {
-	var param table.SoftwareCopyright
+	var param request.SCTriggerParam
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.FailWithError(err, c)
 		return
 	}
-	err = scSev.GetSoftwareCopyrightService().TriggerGenerate(param.UserId, param.Id)
+	err = scSev.GetSoftwareCopyrightService().TriggerGenerate(param.Id)
 	if err != nil {
-		m.AdminLog(c, "SOFTWARE_COPYRIGHT_TRIGGER", fmt.Sprintf("创建软著任务失败，原因：%s", err.Error()))
+		m.AdminLog(c, "SOFTWARE_COPYRIGHT_TRIGGER", fmt.Sprintf("重新触发软著生成任务 %d 失败，原因：%s", param.Id, err.Error()))
 		response.FailWithError(err, c)
 		return
 	}
-	m.AdminLog(c, "SOFTWARE_COPYRIGHT_TRIGGER", fmt.Sprintf("创建软著任务 %s", param.Name))
+	m.AdminLog(c, "SOFTWARE_COPYRIGHT_TRIGGER", fmt.Sprintf("重新触发软著生成任务 %d", param.Id))
 	response.Ok(c)
 }

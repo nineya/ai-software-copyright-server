@@ -105,7 +105,7 @@ func (p *DifyPlugin) sendRequest(url, apiKey string, param any) ([]byte, error) 
 	if err != nil {
 		return nil, err
 	}
-	global.LOG.Info("Dify请求：", zap.String("url", url), zap.Any("param", param), zap.String("result", string(result)))
+	global.LOG.Info("Dify请求：", zap.String("url", url), zap.Any("apiKey", apiKey), zap.Any("param", param), zap.String("result", string(result)))
 	return result, nil
 }
 
@@ -151,7 +151,7 @@ func (p *DifyPlugin) sendSSERequest(url, apiKey string, param any, event func(by
 		//global.LOG.Debug("Dify SSE请求结果片段：", zap.String("url", url), zap.String("result", result))
 		err = event(result)
 		if err != nil {
-			global.LOG.Error("Dify SSE请求Event执行失败：", zap.String("url", url), zap.Any("result", result), zap.Error(err))
+			global.LOG.Error("Dify SSE请求Event执行失败：", zap.String("url", url), zap.Any("apiKey", apiKey), zap.Any("result", result), zap.Error(err))
 			return err
 		}
 	}

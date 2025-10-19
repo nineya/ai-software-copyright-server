@@ -120,17 +120,20 @@ func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopy
 }
 
 // 触发重新生成任务
-func (s *SoftwareCopyrightService) TriggerGenerate(userId, id int64) error {
-	mod, err := s.GetById(userId, id)
+func (s *SoftwareCopyrightService) TriggerGenerate(id int64) error {
+	mod := &table.SoftwareCopyright{}
+	exist, err := s.Db.ID(id).Get(mod)
 	if err != nil {
 		return err
 	}
-	if mod.Id == 0 {
+	if !exist {
 		return errors.New("该软著申请不存在")
 	}
 	mod.Progress = 0
 	mod.Status = enum.SoftwareCopyrightStatus(4)
-	_, err = s.WhereUserSession(mod.UserId).ID(mod.Id).Update(mod)
+	mod.ApiKey = ""
+	mod.ConversationId = ""
+	_, err = s.Db.ID(mod.Id).AllCols().Update(mod)
 	if err != nil {
 		return errors.Wrap(err, "更新软著申请状态失败")
 	}
@@ -616,6 +619,8 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 `, item.Name, item.Desc, item.Operation, htmlContent)
 		param.Inputs["mode"] = "demo"
 		htmlContent, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+		// 去除代码块符号
+		htmlContent = regexp.MustCompile("(?m)^\\s*```\\w*$").ReplaceAllString(htmlContent, "")
 		if err != nil || strings.TrimSpace(htmlContent) == "" {
 			global.LOG.Error(fmt.Sprintf("[%d]生成用户手册%s的demo失败：%+v", sc.Id, item.Name, err))
 		} else {
