@@ -69,7 +69,7 @@ func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (str
 		case "message":
 			resultText += result.Answer
 		case "error": // 执行出错
-			global.LOG.Error("Dify SSE执行失败：", zap.String("result", content))
+			global.LOG.Error("Dify SSE执行失败：", zap.Any("apiKey", apiKey), zap.String("result", content))
 			return errors.New(result.Message)
 		}
 		if conversationId == "" {
@@ -133,7 +133,7 @@ func (p *DifyPlugin) sendSSERequest(url, apiKey string, param any, event func(by
 	}
 	defer resp.Body.Close()
 
-	global.LOG.Info("Dify SSE请求发起：", zap.String("url", url), zap.Any("param", param))
+	global.LOG.Info("Dify SSE请求发起：", zap.String("url", url), zap.Any("apiKey", apiKey), zap.Any("param", param))
 
 	// 读取 SSE 流
 	reader := bufio.NewReader(resp.Body)
