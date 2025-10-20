@@ -727,6 +727,10 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	global.LOG.Info(fmt.Sprintf("[%d]开始处理软著申请：%s", sc.Id, sc.Name))
 	// 创建目录
 	storePath := utils.GetSoftwareCopyrightPath(sc.Id)
+	if err = os.RemoveAll(storePath); err != nil {
+		global.LOG.Error(fmt.Sprintf("[%d]删除软著会话目录失败：%+v", sc.Id, err))
+		return
+	}
 	demoPath := storePath + "/demo"
 	demoFile := storePath + "/demo.zip"
 	if err = os.MkdirAll(demoPath, 0755); err != nil {
