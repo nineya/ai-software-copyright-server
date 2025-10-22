@@ -91,6 +91,7 @@ func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopy
 	param.UserId = userId
 	param.Progress = 0
 	param.Status = enum.SoftwareCopyrightStatus(4)
+	param.Mode = enum.SoftwareCopyrightMode(1)
 
 	result := &response.UserBuyResponse{}
 	err = s.DbTransaction(func(session *xorm.Session) error {
@@ -120,9 +121,9 @@ func (s *SoftwareCopyrightService) Create(userId int64, param table.SoftwareCopy
 }
 
 // 触发重新生成任务
-func (s *SoftwareCopyrightService) TriggerGenerate(id int64) error {
+func (s *SoftwareCopyrightService) TriggerGenerate(param request.SCTriggerParam) error {
 	mod := &table.SoftwareCopyright{}
-	exist, err := s.Db.ID(id).Get(mod)
+	exist, err := s.Db.ID(param.Id).Get(mod)
 	if err != nil {
 		return err
 	}
@@ -131,8 +132,14 @@ func (s *SoftwareCopyrightService) TriggerGenerate(id int64) error {
 	}
 	mod.Progress = 0
 	mod.Status = enum.SoftwareCopyrightStatus(4)
-	mod.ApiKey = ""
-	mod.ConversationId = ""
+	mod.Mode = param.Mode
+	// 更新apikey
+	if param.ApiKey != nil {
+		if *param.ApiKey != mod.ApiKey {
+			mod.ConversationId = ""
+		}
+		mod.ApiKey = *param.ApiKey
+	}
 	_, err = s.Db.ID(mod.Id).AllCols().Update(mod)
 	if err != nil {
 		return errors.Wrap(err, "更新软著申请状态失败")
@@ -376,7 +383,7 @@ func (s *SoftwareCopyrightService) doGenerateCodeFile(handler *SoftwareCopyright
 }
 
 // 执行生成文档鉴别材料和demo
-func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCopyrightTaskHandler, storePath, demoPath, demoFile string) {
+func (s *SoftwareCopyrightService) doGenerateDocumentFileAndDemo(handler *SoftwareCopyrightTaskHandler, storePath, demoPath, demoFile string) {
 	defer handler.Wait.Done()
 	sc := handler.SC
 	param := handleDifyParam("用户手册", "请帮我编写内容", sc)
@@ -728,14 +735,42 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	}()
 
 	global.LOG.Info(fmt.Sprintf("[%d]开始处理软著申请：%s", sc.Id, sc.Name))
-	// 创建目录
 	storePath := utils.GetSoftwareCopyrightPath(sc.Id)
-	if err = os.RemoveAll(storePath); err != nil {
-		global.LOG.Error(fmt.Sprintf("[%d]删除软著会话目录失败：%+v", sc.Id, err))
-		return
-	}
 	demoPath := storePath + "/demo"
 	demoFile := storePath + "/demo.zip"
+	// 删除目录
+	switch sc.Mode {
+	case enum.SoftwareCopyrightMode(2): // 申请表
+		if err = os.RemoveAll(storePath + "/著作权登记表.docx"); err != nil {
+			global.LOG.Error(fmt.Sprintf("[%d]删除软著著作权登记表文件失败：%+v", sc.Id, err))
+			return
+		}
+	case enum.SoftwareCopyrightMode(3): // 代码材料
+		if err = os.RemoveAll(storePath + "/程序鉴别材料.docx"); err != nil {
+			global.LOG.Error(fmt.Sprintf("[%d]删除软著程序鉴别材料文件失败：%+v", sc.Id, err))
+			return
+		}
+	case enum.SoftwareCopyrightMode(4): // 文档材料
+		if err = os.RemoveAll(storePath + "/文档鉴别材料.docx"); err != nil {
+			global.LOG.Error(fmt.Sprintf("[%d]删除软著文档鉴别材料文件失败：%+v", sc.Id, err))
+			return
+		}
+		if err = os.RemoveAll(demoPath); err != nil {
+			global.LOG.Error(fmt.Sprintf("[%d]删除软著demo目录失败：%+v", sc.Id, err))
+			return
+		}
+		if err = os.RemoveAll(demoFile); err != nil {
+			global.LOG.Error(fmt.Sprintf("[%d]删除软著demo压缩文件失败：%+v", sc.Id, err))
+			return
+		}
+	default:
+		if err = os.RemoveAll(storePath); err != nil {
+			global.LOG.Error(fmt.Sprintf("[%d]删除软著会话目录失败：%+v", sc.Id, err))
+			return
+		}
+		handler.Wait.Add(3)
+	}
+	// 创建目录
 	if err = os.MkdirAll(demoPath, 0755); err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]创建软著会话目录失败：%+v", sc.Id, err))
 		return
@@ -765,17 +800,33 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 		global.LOG.Error(fmt.Sprintf("[%d]用户需求结果解析失败：%+v", sc.Id, err))
 		return
 	}
-	// 更新会话名字
-	_, _ = difyPlugin.GetDifyPlugin().ConversationRename(handler.ApiKey, conversationId, difyPlugin.DifyConversationRenameParam{Name: sc.Name, User: param.User})
-	param.ConversationId = conversationId
-	sc.ApiKey = handler.ApiKey
-	sc.ConversationId = conversationId
-	handler.ProgressCount = 9 + (len(requirements) * 4)
+	// 如果是新建会话
+	if sc.ApiKey == "" {
+		// 更新会话名字
+		_, _ = difyPlugin.GetDifyPlugin().ConversationRename(handler.ApiKey, conversationId, difyPlugin.DifyConversationRenameParam{Name: sc.Name, User: param.User})
+		// 更新软著申请apikey信息
+		sc.ApiKey = handler.ApiKey
+		sc.ConversationId = conversationId
+	}
+	// 更新处理模块信息
 	handler.ProgressCurrent = 0
+	handler.ProgressCount = 9 + (len(requirements) * 4)
 	handler.Requirements = requirements
 	handler.Wait = sync.WaitGroup{}
-	handler.Wait.Add(3)
-	// 软著进度
+	switch sc.Mode {
+	case enum.SoftwareCopyrightMode(2): // 申请表
+		handler.ProgressCount = 8 + (len(requirements) * 4) // 1+0
+		handler.Wait.Add(1)
+	case enum.SoftwareCopyrightMode(3): // 代码材料
+		handler.ProgressCount = 8 + (len(requirements) * 3) // 1+1
+		handler.Wait.Add(1)
+	case enum.SoftwareCopyrightMode(4): // 文档材料
+		handler.ProgressCount = 4 + (len(requirements) * 2) // 5+2
+		handler.Wait.Add(1)
+	default:
+		handler.Wait.Add(3)
+	}
+	// 更新进度
 	err = handler.UpdateProgress(1+len(requirements), "软著用户需求分析")
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]更新软著会话ID失败：%+v", sc.Id, err))
@@ -783,13 +834,19 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	}
 
 	// *生成申请文档
-	go s.doGenerateRequestFile(handler, storePath)
+	if sc.Mode == enum.SoftwareCopyrightMode(1) || sc.Mode == enum.SoftwareCopyrightMode(2) {
+		go s.doGenerateRequestFile(handler, storePath)
+	}
 
 	// *生成源代码
-	go s.doGenerateCodeFile(handler, storePath)
+	if sc.Mode == enum.SoftwareCopyrightMode(1) || sc.Mode == enum.SoftwareCopyrightMode(3) {
+		go s.doGenerateCodeFile(handler, storePath)
+	}
 
 	// *生成用户手册
-	go s.doGenerateBookFileAndDemo(handler, storePath, demoPath, demoFile)
+	if sc.Mode == enum.SoftwareCopyrightMode(1) || sc.Mode == enum.SoftwareCopyrightMode(4) {
+		go s.doGenerateDocumentFileAndDemo(handler, storePath, demoPath, demoFile)
+	}
 
 	// 等待所有生成任务完成
 	handler.Wait.Wait()

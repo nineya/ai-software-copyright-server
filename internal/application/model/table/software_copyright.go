@@ -17,8 +17,9 @@ type SoftwareCopyright struct {
 	Owner          string                       `json:"owner" xorm:"VARCHAR(50) notnull comment('著作权人')" binding:"required,lte=50" label:"著作权人"`
 	Progress       int                          `json:"progress" xorm:"notnull comment('生成进度')" label:"生成进度"`
 	Status         enum.SoftwareCopyrightStatus `json:"status" xorm:"SMALLINT notnull comment('状态')" label:"状态"`
-	ApiKey         string                       `json:"-" xorm:"VARCHAR(128) notnull comment('应用ApiKey')" binding:"lte=128" label:"应用ApiKey"`
-	ConversationId string                       `json:"-" xorm:"VARCHAR(50) notnull comment('会话id')" binding:"lte=50" label:"会话id"`
+	Mode           enum.SoftwareCopyrightMode   `json:"-" xorm:"SMALLINT notnull comment('生成模式')" label:"生成模式"`
+	ApiKey         string                       `json:"-" xorm:"VARCHAR(128) notnull comment('应用ApiKey')" label:"应用ApiKey"`
+	ConversationId string                       `json:"-" xorm:"VARCHAR(50) notnull comment('会话id')" label:"会话id"`
 	CreateTime     *time.Time                   `json:"createTime" xorm:"DATETIME created"`
 	UpdateTime     *time.Time                   `json:"updateTime" xorm:"DATETIME updated"`
 }
