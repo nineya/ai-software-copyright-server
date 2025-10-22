@@ -117,7 +117,7 @@ func (m *AuthApiRouter) Register(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	_, err = userSev.GetAuthService().Register(param)
+	_, err = userSev.GetAuthService().Register(param, c.ClientIP())
 	if err != nil {
 		m.UserLog(c, "FAILED_LOGIN", fmt.Sprintf("用户注册失败，原因：%s", err.Error()))
 		response.FailWithError(err, c)
@@ -138,7 +138,7 @@ func (m *AuthApiRouter) Register(c *gin.Context) {
 func (m *AuthApiRouter) Authorization(c *gin.Context) {
 	code := c.Query("code")
 	inviter := c.Query("inviter")
-	token, err := userSev.GetAuthService().Authorization(code, inviter)
+	token, err := userSev.GetAuthService().Authorization(code, inviter, c.ClientIP())
 	result := response.Response{}
 	if err != nil {
 		result.Status = 500

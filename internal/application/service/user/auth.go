@@ -53,7 +53,7 @@ func (s *AuthService) Login(param request.UserLoginParam) (*common.Token, error)
 	return utils.AuthToken(user.Id, global.User)
 }
 
-func (s *AuthService) Register(param table.User) (*table.User, error) {
+func (s *AuthService) Register(param table.User, ip string) (*table.User, error) {
 	// 用户实体
 	if param.Phone != nil {
 		exist, err := s.Db.Get(&table.User{Phone: param.Phone})
@@ -80,7 +80,16 @@ func (s *AuthService) Register(param table.User) (*table.User, error) {
 		}
 		param.Password = string(hashPwd)
 	}
-	err := s.DbTransaction(func(session *xorm.Session) error {
+	// 如果这个ip有访问记录，则它不符合邀请规则
+	exist, err := s.Db.Exist(&table.UserLog{IpAddress: ip})
+	if err != nil {
+		return nil, errors.Wrap(err, "系统繁忙，注册失败")
+	}
+	if exist {
+		param.Inviter = ""
+		global.LOG.Warn(fmt.Sprintf("邀请码：%s 无效，该ip %s 有过访问记录", param.Inviter, ip))
+	}
+	err = s.DbTransaction(func(session *xorm.Session) error {
 		_, err := session.Insert(&param)
 		if err != nil {
 			return err
@@ -129,7 +138,7 @@ func (s *AuthService) Register(param table.User) (*table.User, error) {
 }
 
 // 微信授权登录
-func (s *AuthService) Authorization(code, inviter string) (*common.Token, error) {
+func (s *AuthService) Authorization(code, inviter, ip string) (*common.Token, error) {
 	if code == "" {
 		return nil, errors.New("登录状态错误，请刷新")
 	}
@@ -177,7 +186,7 @@ func (s *AuthService) Authorization(code, inviter string) (*common.Token, error)
 			}
 		}
 		// 注册用户
-		user, err = s.Register(userInfo)
+		user, err = s.Register(userInfo, ip)
 		if err != nil {
 			return nil, errors.Wrap(err, "用户注册失败，请重试")
 		}
