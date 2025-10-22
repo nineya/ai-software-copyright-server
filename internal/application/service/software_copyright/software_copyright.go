@@ -309,7 +309,7 @@ func (s *SoftwareCopyrightService) doGenerateRequestFile(handler *SoftwareCopyri
 	funcData = append(funcData, []string{"软件运行支撑环境/支持软件", "客户端：SQLite3；服务端：Nginx, MySQL, Redis", "可以酌情修改"})
 	funcData = append(funcData, []string{"编程语言", sc.CodeLang})
 	funcData = append(funcData, []string{"源程序量", strconv.Itoa(25000 + rand.Intn(10000))})
-	requestStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+	requestStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]生成软著申请登记信息失败：%+v", sc.Id, err))
 		return
@@ -343,7 +343,7 @@ func (s *SoftwareCopyrightService) doGenerateCodeFile(handler *SoftwareCopyright
 	sc := handler.SC
 	param := handleDifyParam("源代码", "请帮我编写内容", sc)
 	// *生成源代码
-	codeStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+	codeStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]生成软件源代码失败：%+v", sc.Id, err))
 		return
@@ -553,7 +553,7 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 ...
 ## 1.3 目标用户
 ...`
-	bookStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+	bookStr, _, err := difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]生成用户手册的引言失败：%+v", sc.Id, err))
 		return
@@ -565,7 +565,7 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 	bookDoc.AddHeadingParagraph("第二章 软件概述", 1)
 	param.Query = `请结合软件的功能和信息，帮我完成软件概述章节的编写。容要丰富、有深度，可以分多段回答。
 直接回复章节内容，不用包含大标题，不要有其他任何的解释说明。`
-	bookStr, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+	bookStr, _, err = difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]生成用户手册的软件概述失败：%+v", sc.Id, err))
 		return
@@ -582,7 +582,7 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 ...
 ## 3.2 运行软件环境
 ...`
-	bookStr, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+	bookStr, _, err = difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]生成用户手册的软件概述失败：%+v", sc.Id, err))
 		return
@@ -599,9 +599,6 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 		width = 1920
 		height = 1080
 	}
-	// 创建chrome上下文
-	chromeCtx, chromeCancel := chromedp.NewContext(context.Background())
-	defer chromeCancel()
 	for i, item := range handler.Requirements {
 		bookDoc.AddHeadingParagraph(fmt.Sprintf("4.%d %s", i+1, item.Name), 2)
 		// 生成demo代码
@@ -618,7 +615,7 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 %s
 `, item.Name, item.Desc, item.Operation, htmlContent)
 		param.Inputs["mode"] = "demo"
-		htmlContent, _, err = difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+		htmlContent, _, err = difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 		// 去除代码块符号
 		htmlContent = regexp.MustCompile("(?m)^\\s*```\\w*$").ReplaceAllString(htmlContent, "")
 		if err != nil || strings.TrimSpace(htmlContent) == "" {
@@ -629,27 +626,33 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 			err = os.WriteFile(htmlPath, []byte(htmlContent), 0644)
 			if err != nil {
 				global.LOG.Error(fmt.Sprintf("[%d]用户手册%s的demo写入文件失败：%+v", sc.Id, item.Name, err))
-			}
-			var imageBytes []byte
-			err = chromedp.Run(chromeCtx,
-				// 设置视口
-				chromedp.EmulateViewport(width, height),
-				// 设置内容
-				chromedp.Navigate("file://"+htmlPath),
-				//chromedp.Navigate("data:text/html;charset=utf-8;base64,"+
-				//	base64.StdEncoding.EncodeToString([]byte(htmlContent))),
-				// 等待页面加载完成
-				chromedp.WaitReady("body"),
-				// 等待 JavaScript 执行
-				chromedp.Sleep(2*time.Second),
-				// 截图
-				chromedp.CaptureScreenshot(&imageBytes),
-				//chromedp.FullScreenshot(&imageBytes, 100), // 这个是截所有内容，不符合要求
-			)
-			if err != nil {
-				global.LOG.Error(fmt.Sprintf("[%d]生成用户手册%s的demo运行截图失败：%+v", sc.Id, item.Name, err))
 			} else {
-				addImageIntoWord(imageBytes, bookDoc)
+				// 创建chrome上下文
+				chromeCtx, chromeCancel := context.WithTimeout(context.Background(), 15*time.Second)
+				ctx, cancel := chromedp.NewContext(chromeCtx)
+				var imageBytes []byte
+				err = chromedp.Run(ctx,
+					// 设置视口
+					chromedp.EmulateViewport(width, height),
+					// 设置内容
+					chromedp.Navigate("file://"+htmlPath),
+					//chromedp.Navigate("data:text/html;charset=utf-8;base64,"+
+					//	base64.StdEncoding.EncodeToString([]byte(htmlContent))),
+					// 等待页面加载完成
+					chromedp.WaitReady("body"),
+					// 等待 JavaScript 执行
+					chromedp.Sleep(2*time.Second),
+					// 截图
+					chromedp.CaptureScreenshot(&imageBytes),
+					//chromedp.FullScreenshot(&imageBytes, 100), // 这个是截所有内容，不符合要求
+				)
+				cancel()
+				chromeCancel()
+				if err != nil {
+					global.LOG.Error(fmt.Sprintf("[%d]生成用户手册%s的demo运行截图失败：%+v", sc.Id, item.Name, err))
+				} else {
+					addImageIntoWord(imageBytes, bookDoc)
+				}
 			}
 		}
 		// 更新进度
@@ -661,7 +664,7 @@ func (s *SoftwareCopyrightService) doGenerateBookFileAndDemo(handler *SoftwareCo
 		// 生成操作流程图
 		param.Query = item.Operation
 		param.Inputs["mode"] = "流程图"
-		base64Text, _, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+		base64Text, _, err := difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 		if err != nil {
 			global.LOG.Error(fmt.Sprintf("[%d]生成用户手册%s的流程图失败：%+v", sc.Id, item.Name, err))
 		} else {
@@ -751,7 +754,7 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	param := handleDifyParam("需求分析", "请帮我编写内容", sc)
 
 	// *分析用户需求
-	requirementJson, conversationId, err := difyPlugin.GetDifyPlugin().SendSSEChat(handler.ApiKey, param)
+	requirementJson, conversationId, err := difyPlugin.GetDifyPlugin().SendSSEChatAndRetry(handler.ApiKey, param, 3)
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]分析用户需求失败：%+v", sc.Id, err))
 		return

@@ -53,6 +53,10 @@ func (p *DifyPlugin) SendChat(apiKey string, param DifyChatMessageParam) (*DifyC
 }
 
 func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (string, string, error) {
+	return p.SendSSEChatAndRetry(apiKey, param, 0)
+}
+
+func (p *DifyPlugin) SendSSEChatAndRetry(apiKey string, param DifyChatMessageParam, retryCount int) (string, string, error) {
 	param.ResponseMode = "streaming"
 
 	resultText := ""
@@ -77,6 +81,10 @@ func (p *DifyPlugin) SendSSEChat(apiKey string, param DifyChatMessageParam) (str
 		}
 		return nil
 	})
+	if err != nil && retryCount > 0 {
+		global.LOG.Error("Dify SSE执行失败，准备开始重试：", zap.Any("apiKey", apiKey), zap.Int("retryCount", retryCount))
+		return p.SendSSEChatAndRetry(apiKey, param, retryCount-1)
+	}
 	return resultText, conversationId, err
 }
 

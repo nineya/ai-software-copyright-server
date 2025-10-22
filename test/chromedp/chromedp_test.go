@@ -31,7 +31,10 @@ func HTMLToScreenshot(t *testing.T) {
 	// 将字符串写入文件，如果文件不存在会创建，存在则覆盖
 	os.WriteFile(htmlPath, []byte(htmlContent), 0644)
 	// 创建上下文
-	ctx, cancel := chromedp.NewContext(context.Background())
+	chromeCtx, chromeCancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer chromeCancel()
+
+	ctx, cancel := chromedp.NewContext(chromeCtx)
 	defer cancel()
 
 	var buf []byte
