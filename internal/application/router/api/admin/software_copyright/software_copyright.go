@@ -34,7 +34,7 @@ func (m *SoftwareCopyrightApiRouter) Trigger(c *gin.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	err = scSev.GetSoftwareCopyrightService().TriggerGenerate(param.Id)
+	err = scSev.GetSoftwareCopyrightService().TriggerGenerate(param)
 	if err != nil {
 		m.AdminLog(c, "SOFTWARE_COPYRIGHT_TRIGGER", fmt.Sprintf("重新触发软著生成任务 %d 失败，原因：%s", param.Id, err.Error()))
 		response.FailWithError(err, c)
