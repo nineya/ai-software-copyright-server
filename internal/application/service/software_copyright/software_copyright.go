@@ -132,7 +132,11 @@ func (s *SoftwareCopyrightService) TriggerGenerate(param request.SCTriggerParam)
 	}
 	mod.Progress = 0
 	mod.Status = enum.SoftwareCopyrightStatus(4)
-	mod.Mode = param.Mode
+	if mod.Mode == 0 {
+		mod.Mode = enum.SoftwareCopyrightMode(1)
+	} else {
+		mod.Mode = param.Mode
+	}
 	// 更新apikey
 	if param.ApiKey != nil {
 		if *param.ApiKey != mod.ApiKey {
@@ -157,40 +161,55 @@ func (s *SoftwareCopyrightService) ProcessGenerateTask(sc *table.SoftwareCopyrig
 		s.HandlerMutex.Unlock()
 	}()
 
-	// 取得可执行任务体
-	var handler *SoftwareCopyrightTaskHandler
-	for _, h := range s.Handlers {
-		// 还没有结束，跳过
-		if !h.IsEnd {
-			continue
-		}
-		// 如果handler的结束时间更晚，用h替换
-		if handler == nil || handler.EndTime.After(h.EndTime) {
-			handler = h
-		}
-	}
-	if handler == nil {
-		return
-	}
-	// 没有传入软著信息，尝试触发下一个排队的软著
-	if sc == nil {
-		// 查询下一个待生成的软著
-		nextSc := &table.SoftwareCopyright{Status: enum.SoftwareCopyrightStatus(4)}
-		exist, err := s.Db.Get(nextSc)
+	// 取得待生成的软著列表
+	list := make([]*table.SoftwareCopyright, 0)
+	if sc != nil {
+		list = append(list, sc)
+	} else {
+		// 查询待生成的软著列表
+		nextList := make([]*table.SoftwareCopyright, 0)
+		err := s.Db.Where("status=?", enum.SoftwareCopyrightStatus(4)).Find(&nextList)
 		if err != nil {
 			global.LOG.Error(fmt.Sprintf("查询排队中的软著申请失败：%+v", err))
 		}
-		if !exist {
+		list = append(list, nextList...)
+		if len(list) == 0 {
 			global.LOG.Info("没有排队中的软著申请")
 			return
 		}
-		sc = nextSc
 	}
 
-	// 执行任务
-	handler.IsEnd = false
-	handler.SC = sc
-	go s.RunGenerateTask(handler)
+	// 处理所有能处理的软著
+	for _, item := range list {
+		var handler *SoftwareCopyrightTaskHandler
+		for _, h := range s.Handlers {
+			// 还没有结束，跳过
+			if !h.IsEnd {
+				continue
+			}
+			// apikey 不相等，也跳过
+			if item.ApiKey != "" {
+				if h.ApiKey != item.ApiKey {
+					continue
+				} else {
+					handler = h
+					break
+				}
+			}
+			// 如果handler的结束时间更晚，用h替换
+			if handler == nil || handler.EndTime.After(h.EndTime) {
+				handler = h
+			}
+		}
+		// 没有渠道合适的handler，尝试处理下一个软著
+		if handler == nil {
+			continue
+		}
+		// 执行任务
+		handler.IsEnd = false
+		handler.SC = sc
+		go s.RunGenerateTask(handler)
+	}
 }
 
 // 执行生成申请文件
