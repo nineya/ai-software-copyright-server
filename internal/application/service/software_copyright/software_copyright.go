@@ -834,19 +834,19 @@ func (s *SoftwareCopyrightService) RunGenerateTask(handler *SoftwareCopyrightTas
 	handler.Wait = sync.WaitGroup{}
 	switch sc.Mode {
 	case enum.SoftwareCopyrightMode(2): // 申请表
-		handler.ProgressCount = 8 + (len(requirements) * 4) // 1+0
+		// 更新进度
+		err = handler.UpdateProgress(8+(len(requirements)*4), "软著申请表重新生成，恢复软著进度") // 1+0
 		handler.Wait.Add(1)
 	case enum.SoftwareCopyrightMode(3): // 代码材料
-		handler.ProgressCount = 8 + (len(requirements) * 3) // 1+1
+		err = handler.UpdateProgress(8+(len(requirements)*3), "软著代码材料重新生成，恢复软著进度") // 1+1
 		handler.Wait.Add(1)
 	case enum.SoftwareCopyrightMode(4): // 文档材料
-		handler.ProgressCount = 4 + (len(requirements) * 2) // 5+2
+		err = handler.UpdateProgress(4+(len(requirements)*2), "软著代码材料重新生成，恢复软著进度") // 5+2
 		handler.Wait.Add(1)
 	default:
+		err = handler.UpdateProgress(1+len(requirements), "软著用户需求分析")
 		handler.Wait.Add(3)
 	}
-	// 更新进度
-	err = handler.UpdateProgress(1+len(requirements), "软著用户需求分析")
 	if err != nil {
 		global.LOG.Error(fmt.Sprintf("[%d]更新软著会话ID失败：%+v", sc.Id, err))
 		return
